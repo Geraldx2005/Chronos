@@ -1,5 +1,5 @@
 // TrimMarksPDFLib.jsx
-import { PDFDocument, rgb } from 'pdf-lib';
+import { PDFDocument, rgb } from "pdf-lib";
 
 export const addTrimMarksToPDF = async (pdfBytes) => {
   try {
@@ -8,14 +8,14 @@ export const addTrimMarksToPDF = async (pdfBytes) => {
 
     pages.forEach((page) => {
       const { width, height } = page.getSize();
-      
+
       // Add trim marks to each page
       addPageTrimMarks(page, width, height);
     });
 
     return await pdfDoc.save();
   } catch (error) {
-    console.error('Error adding trim marks:', error);
+    console.error("Error adding trim marks:", error);
     throw error;
   }
 };
@@ -26,31 +26,38 @@ const addPageTrimMarks = (page, pageWidth, pageHeight) => {
   const verticalPadding = 10.11;
   const couponWidth = 119.07;
   const couponHeight = 212.63;
-  
+
   // Different lengths for horizontal and vertical crop marks
-  const horizontalMarkLength = 10.11; // For vertical crop marks (top/bottom)
-  const verticalMarkLength = 15.255;  // For horizontal crop marks (left/right)
+//   const horizontalMarkLength = 10.11; // For vertical crop marks (top/bottom)
+//   const verticalMarkLength = 15.255; // For horizontal crop marks (left/right)
+  const horizontalMarkLength = 8; // For vertical crop marks (top/bottom)
+  const verticalMarkLength = 8; // For horizontal crop marks (left/right)
+
 
   // Calculate number of coupons per row and column
-  const couponsPerRow = Math.floor((pageWidth - (2 * horizontalPadding)) / couponWidth);
-  const couponsPerColumn = Math.floor((pageHeight - (2 * verticalPadding)) / couponHeight);
-  
+  const couponsPerRow = Math.floor((pageWidth - 2 * horizontalPadding) / couponWidth);
+  const couponsPerColumn = Math.floor((pageHeight - 2 * verticalPadding) / couponHeight);
+
+  // Offset for crop marks (distance from edge of the page)
+  const Xoffset = 2.11;
+  const Yoffset = 7.255;
+
   // Top and bottom vertical crop marks
   for (let i = 0; i <= couponsPerRow; i++) {
-    const x = horizontalPadding + (i * couponWidth);
-    
-    // Draw vertical crop mark at top (using horizontalMarkLength)
+    const x = horizontalPadding + i * couponWidth;
+
+    // Draw vertical crop mark at top (start 3pt below top edge)
     page.drawLine({
-      start: { x: x, y: pageHeight },
-      end: { x: x, y: pageHeight - horizontalMarkLength },
+      start: { x: x, y: pageHeight - Xoffset },
+      end: { x: x, y: pageHeight - horizontalMarkLength - Xoffset },
       thickness: markThickness,
       color: rgb(0, 0, 0),
     });
 
-    // Draw vertical crop mark at bottom (using horizontalMarkLength)
+    // Draw vertical crop mark at bottom (start 3pt above bottom edge)
     page.drawLine({
-      start: { x: x, y: 0 },
-      end: { x: x, y: horizontalMarkLength },
+      start: { x: x, y: Xoffset },
+      end: { x: x, y: horizontalMarkLength + Xoffset },
       thickness: markThickness,
       color: rgb(0, 0, 0),
     });
@@ -58,20 +65,20 @@ const addPageTrimMarks = (page, pageWidth, pageHeight) => {
 
   // Left and right horizontal crop marks
   for (let i = 0; i <= couponsPerColumn; i++) {
-    const y = verticalPadding + (i * couponHeight);
-    
+    const y = verticalPadding + i * couponHeight;
+
     // Draw horizontal crop mark at left (using verticalMarkLength)
     page.drawLine({
-      start: { x: 0, y: y },
-      end: { x: verticalMarkLength, y: y },
+      start: { x: Yoffset, y: y },
+      end: { x: verticalMarkLength + Yoffset, y: y },
       thickness: markThickness,
       color: rgb(0, 0, 0),
     });
 
     // Draw horizontal crop mark at right (using verticalMarkLength)
     page.drawLine({
-      start: { x: pageWidth - verticalMarkLength, y: y },
-      end: { x: pageWidth, y: y },
+      start: { x: pageWidth - verticalMarkLength - Yoffset, y: y },
+      end: { x: pageWidth - Yoffset, y: y },
       thickness: markThickness,
       color: rgb(0, 0, 0),
     });
