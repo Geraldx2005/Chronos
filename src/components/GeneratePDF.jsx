@@ -235,7 +235,7 @@ export default function GeneratePDF({ coupons }) {
   const [pdfBlob, setPdfBlob] = useState(null);
   const prevCouponsRef = useRef([]);
 
-  console.log(coupons);
+  // console.log(coupons); --> For testing of coupon data
 
   // Generate QR for ALL coupons so indexing matches across pages
   useEffect(() => {
@@ -299,7 +299,7 @@ export default function GeneratePDF({ coupons }) {
   };
 
   if (!isReady || qrList.length !== coupons.length) {
-    return <LoadingSpinner message="Preparing your PDF..." />;
+    return <LoadingSpinner message="Generating QR..." />;
   }
 
   if (isGenerating) {

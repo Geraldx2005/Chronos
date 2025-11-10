@@ -103,7 +103,7 @@ export default function UploadExcel({ setCoupons }) {
         {isLoading ? (
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 border-2 border-emerald-700 border-t-transparent rounded-full animate-spin" />
-            <h1 className="font-bold text-lg">Processing...</h1>
+            <h1 className="font-bold text-lg">Extracting data from xls...</h1>
           </div>
         ) : (
           <>

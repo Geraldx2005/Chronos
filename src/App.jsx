@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
 import UploadExcel from "./components/UploadExcel";
-// import CouponGrid from "./components/CouponGrid";
 import GeneratePDF from "./components/GeneratePDF";
 import RefreshBtn from "./components/RefreshBtn";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -29,8 +28,6 @@ export default function App() {
             <h1 className="text-xl font-semibold text-emerald-950 text-center">
               {coupons.length} Coupon{coupons.length !== 1 ? "s" : ""}
             </h1>
-
-            {/* <CouponGrid coupons={coupons} /> */}
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
               <ErrorBoundary>
