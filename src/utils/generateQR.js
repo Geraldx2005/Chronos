@@ -2,7 +2,6 @@ import QRCode from "qrcode";
 
 export const generateQR = async (data) => {
   const obj = JSON.parse(data);
-  console.log(obj.code);
   try {
     return await QRCode.toDataURL(obj.code, {
       margin: 0,          // ✅ Remove white border
