@@ -293,7 +293,7 @@ export default function GeneratePDF({ coupons }) {
     const url = URL.createObjectURL(pdfBlob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "coupons-with-trim-marks.pdf";
+    link.download = "coupons.pdf";
     link.click();
     URL.revokeObjectURL(url);
   };
