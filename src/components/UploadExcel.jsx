@@ -96,13 +96,13 @@ export default function UploadExcel({ setCoupons }) {
     <div className="flex flex-col items-center gap-3">
       <label className={`
         w-xs h-20 flex justify-center items-center gap-2 px-4 mb-5 
-        text-sm text-emerald-700 bg-emerald-100 border border-emerald-700 
-        rounded-md cursor-pointer hover:bg-emerald-200 transition
+        text-sm text-denim-700 bg-denim-100 border border-denim-700 
+        rounded-md cursor-pointer hover:bg-denim-200 transition
         ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}
       `}>
         {isLoading ? (
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 border-2 border-emerald-700 border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-denim-700 border-t-transparent rounded-full animate-spin" />
             <h1 className="font-bold text-lg">Extracting data from xls...</h1>
           </div>
         ) : (

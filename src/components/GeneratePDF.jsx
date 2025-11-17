@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import logo from "../assets/brand-logo.jpg";
 import staticQr from "../assets/static-qr.png";
 import TopLine from "../assets/Top-line.png";
-import BtmLine from "../assets/Btm-line.png";
 import { addTrimMarksToPDF } from "./TrimMarksPDFLib";
 
 // Import font files from npm package
@@ -78,7 +77,7 @@ const DownloadButton = ({ onClick, disabled, isLoading }) => {
       onClick={onClick}
       disabled={disabled}
       className={`w-48 h-10 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-md text-white transition-all
-        ${disabled ? "bg-gray-400 cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-700 active:scale-95"}`}
+        ${disabled ? "bg-gray-400 cursor-not-allowed" : "bg-denim-600 hover:bg-denim-700 active:scale-95"}`}
     >
       Download PDF
     </button>
@@ -233,7 +232,7 @@ const CouponItem = ({ coupon, qrCode }) => (
         </Text>
       </View>
     </View>
-    <Image src={BtmLine} style={{ width: 119.07, position: "absolute", bottom: 0 }} />
+    <Image src={TopLine} style={{ width: 119.07, position: "absolute", bottom: 0 }} />
   </View>
 );
 

@@ -165,7 +165,7 @@ export default function GeneratePDF({ coupons }) {
     <PDFDownloadLink
       document={<PDFDoc />}
       fileName="coupons.pdf"
-      className="w-50 h-10 flex items-center justify-center mt-5 px-4 py-2 bg-emerald-600 text-white text-sm rounded-md hover:bg-emerald-700 transition"
+      className="w-50 h-10 flex items-center justify-center mt-5 px-4 py-2 bg-denim-600 text-white text-sm rounded-md hover:bg-denim-700 transition"
     >
       {({ loading }) => (loading ? "Generating PDF..." : "Download PDF")}
     </PDFDownloadLink>
