@@ -76,10 +76,10 @@ const DownloadButton = ({ onClick, disabled, isLoading }) => {
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`w-48 h-10 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-md text-white transition-all
+      className={`w-48 h-8 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-md text-white transition-all
         ${disabled ? "bg-gray-400 cursor-not-allowed" : "bg-denim-600 hover:bg-denim-700 active:scale-95"}`}
     >
-      Download PDF
+      Download
     </button>
   );
 };
@@ -262,7 +262,7 @@ const PDFDoc = ({ coupons, qrList }) => (
   </Document>
 );
 
-export default function GeneratePDF({ coupons }) {
+export default function GeneratePDF({ coupons, error }) {
   const [qrList, setQrList] = useState([]);
   const [isReady, setIsReady] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -332,13 +332,22 @@ export default function GeneratePDF({ coupons }) {
     URL.revokeObjectURL(url);
   };
 
+  // Before uploading Excel (coupons empty)
+  if (coupons.length === 0 || error) {
+    return <DownloadButton onClick={handleDownload} disabled={true} isLoading={false} />;
+  }
+
+  // QRs not ready yet → show spinner
   if (!isReady || qrList.length !== coupons.length) {
     return <LoadingSpinner message="Generating QR..." />;
   }
 
+  // PDF is generating → spinner inside button
   if (isGenerating) {
     return <DownloadButton onClick={handleDownload} disabled={!pdfBlob} isLoading={true} />;
   }
 
+  // Final normal state
   return <DownloadButton onClick={handleDownload} disabled={!pdfBlob} isLoading={false} />;
+
 }

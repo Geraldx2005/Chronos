@@ -1,11 +1,15 @@
 import { useState, useCallback, useRef } from "react";
 import { CloudUpload } from "@mui/icons-material";
 import ExcelJS from "exceljs";
+import GeneratePDF from "./GeneratePDF";
+import ErrorBoundary from "./ErrorBoundary";
 
-export default function UploadExcel({ setCoupons }) {
+export default function UploadExcel({ setCoupons, hasCoupons, couponsLength, coupons }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
+
+  console.log(error);
 
   const parseExcelFile = useCallback(async (file) => {
     try {
@@ -20,7 +24,7 @@ export default function UploadExcel({ setCoupons }) {
 
       const headers = [];
       const firstRow = worksheet.getRow(1);
-      
+
       // Extract headers
       firstRow.eachCell((cell, colNumber) => {
         headers[colNumber] = cell.value?.toString().trim() || `Column${colNumber}`;
@@ -31,7 +35,7 @@ export default function UploadExcel({ setCoupons }) {
       for (let rowNumber = 2; rowNumber <= worksheet.rowCount; rowNumber++) {
         const row = worksheet.getRow(rowNumber);
         const rowData = {};
-        
+
         let hasData = false;
         row.eachCell((cell, colNumber) => {
           if (cell.value != null) {
@@ -39,7 +43,7 @@ export default function UploadExcel({ setCoupons }) {
             hasData = true;
           }
         });
-        
+
         if (hasData) {
           data.push(rowData);
         }
@@ -66,7 +70,10 @@ export default function UploadExcel({ setCoupons }) {
 
     // Validate file type
     if (!file.name.match(/\.(xlsx|xls)$/i)) {
-      setError("Please upload a valid Excel file (.xlsx or .xls)");
+      setError("Pls upload a valid file (.xlsx)");
+
+      setCoupons([]);
+
       // Clear the invalid file
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -82,50 +89,55 @@ export default function UploadExcel({ setCoupons }) {
       setCoupons(data);
     } catch (err) {
       setError(err.message);
+      setCoupons([]); // <--- important
       console.error("Error processing Excel file:", err);
-    } finally {
-      setIsLoading(false);
-      // Reset input to allow uploading the same file again
+
+      // Only clear if error
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
+
+    } finally {
+      setIsLoading(false);
     }
+
   }, [parseExcelFile, setCoupons]);
 
   return (
-    <div className="flex flex-col items-center gap-3">
-      <label className={`
-        w-xs h-20 flex justify-center items-center gap-2 px-4 mb-5 
-        text-sm text-denim-700 bg-denim-100 border border-denim-700 
-        rounded-md cursor-pointer hover:bg-denim-200 transition
-        ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}
-      `}>
-        {isLoading ? (
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 border-2 border-denim-700 border-t-transparent rounded-full animate-spin" />
-            <h1 className="font-bold text-lg">Extracting data from xls...</h1>
-          </div>
-        ) : (
-          <>
-            <CloudUpload fontSize="large" />
-            <h1 className="font-bold text-lg">Upload file</h1>
-          </>
-        )}
-        <input 
+    <div className="w-full flex flex-col items-center gap-5">
+      <div className="w-full p-3 flex flex-col justify-center items-center gap-1">
+
+        {/* it is recommended to gernerate 100 pages which is 4200 coupons at a time */}
+        <input
           ref={fileInputRef}
-          type="file" 
-          className="hidden" 
-          onChange={handleFile} 
+          className="w-full h-12 p-2 flex items-center cursor-pointer bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-md focus:ring-brand focus:border-brand shadow-xs placeholder:text-body"
+          id="file_input"
+          onChange={handleFile}
           accept=".xlsx,.xls"
           disabled={isLoading}
+          type="file"
         />
-      </label>
 
-      {error && (
-        <div className="text-red-600 text-sm text-center bg-red-50 py-2 px-3 rounded border border-red-200 max-w-xs">
-          {error}
-        </div>
-      )}
+        {/* Shows a count of the number of coupons */}
+        {!error && hasCoupons && (
+          <div className="w-full flex justify-start items-center px-2">
+            <h1 className="text-[14px] text-nero-300">
+              {couponsLength} Coupon{couponsLength !== 1 ? "s" : ""}
+            </h1>
+          </div>
+        )}
+
+        {/* Error message (If something goes wrong*/}
+        {error && (
+          <div className="w-[90%] text-red-200 text-sm text-center py-0 px-2 rounded-md border border-red-200">
+            {error}
+          </div>
+        )}
+      </div>
+
+      <ErrorBoundary>
+        <GeneratePDF coupons={coupons} errror={error} />
+      </ErrorBoundary>
     </div>
   );
 }
