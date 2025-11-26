@@ -4,11 +4,15 @@ import logo from "../assets/brand-logo.jpg";
 import staticQr from "../assets/static-qr.png";
 import TopLine from "../assets/Top-line.png";
 
-const TokenTemplate = ({ coupon, qrCode, couponWidth, couponHeight }) => (
+const TokenTemplate = ({ coupon, qrCode, couponWidthPt, couponHeightPt }) => (
     <View
         style={{
-            width: couponWidth,
-            height: couponHeight,
+            width: couponWidthPt,
+            height: couponHeightPt,
+            // height: 119.05511811059999,
+            // width: 212.5984251975,
+            // width: 119.05511811059999,
+            // height: 212.5984251975,
             // width: 119.07, // 42 mm
             // height: 212.63, // 75 mm
             padding: 5,

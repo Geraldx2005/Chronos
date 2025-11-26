@@ -9,8 +9,6 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
 
-  console.log(error);
-
   const parseExcelFile = useCallback(async (file) => {
     try {
       const workbook = new ExcelJS.Workbook();
@@ -117,7 +115,7 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
         {/* it is recommended to gernerate 100 pages which is 4200 coupons at a time */}
         <input
           ref={fileInputRef}
-          className="w-full h-12 p-2 flex items-center cursor-pointer bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-md focus:ring-brand focus:border-brand shadow-xs placeholder:text-body"
+          className="w-full h-12 p-2 flex items-center cursor-pointer bg-nero-800 border border-default-medium text-heading text-sm rounded-md focus:ring-brand focus:border-brand placeholder:text-body"
           id="file_input"
           onChange={handleFile}
           accept=".xlsx,.xls"

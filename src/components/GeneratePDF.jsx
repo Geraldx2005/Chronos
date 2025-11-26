@@ -84,14 +84,16 @@ const DownloadButton = ({ onClick, disabled, isLoading }) => {
 };
 
 const PDFDoc = ({ coupons, qrList, layout }) => {
-  const { paperWidth, paperHeight, couponWidth, couponHeight } = layout;
+  const { paperWidthPt, paperHeightPt, couponWidthPt, couponHeightPt } = layout;
+
+  console.log(`paper width: ${paperWidthPt}, paper height: ${paperHeightPt}, coupon width: ${couponWidthPt}, coupon height:${couponHeightPt}`);
 
   return (
     <Document>
       {chunk(coupons, 42).map((pageCoupons, pageIndex) => (
         <Page
           key={pageIndex}
-          size={{ width: paperWidth, height: paperHeight }}
+          size={{ width: paperWidthPt, height: paperHeightPt }} // 12 x 18 in (for testing)
           style={{
             flexDirection: "row",
             flexWrap: "wrap",
@@ -109,8 +111,8 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
                 key={globalIndex}
                 coupon={coupon}
                 qrCode={qrList[globalIndex]}
-                couponWidth={couponWidth}
-                couponHeight={couponHeight}
+                couponWidthPt={couponWidthPt}
+                couponHeightPt={couponHeightPt}
                 globalIndex={globalIndex}
               />
             );
@@ -121,8 +123,6 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
   );
 };
 
-
-
 export default function GeneratePDF({ coupons, error }) {
   const [qrList, setQrList] = useState([]);
   const [isReady, setIsReady] = useState(false);
@@ -131,16 +131,12 @@ export default function GeneratePDF({ coupons, error }) {
   const prevCouponsRef = useRef([]);
 
   let layout = useLayout()
-  // const { paperWidth, paperHeight, couponWidth, couponHeight } = layout;
-  // let { paperWidth, paperHeight, couponWidth, couponHeight } = useLayout()
-
   // console.log(coupons); --> For testing of coupon data
 
   // Generate QR for ALL coupons so indexing matches across pages
-
   useEffect(() => {
     if (coupons.length === 0) {
-      prevCouponsRef.current = [];   // 🔥 reset internal cache
+      prevCouponsRef.current = [];   // reset internal cache
     }
   }, [coupons]);
 

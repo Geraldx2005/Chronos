@@ -9,11 +9,6 @@ import GeneratePDF from "./GeneratePDF";
 const Panel = () => {
   const [coupons, setCoupons] = useState([]);
 
-  // // Memoized handler to clear coupons
-  // const handleRefresh = useCallback(() => {
-  //   setCoupons([]);
-  // }, []);
-
   const [resetSignal, setResetSignal] = useState(false);
 
   const handleRefresh = useCallback(() => {
