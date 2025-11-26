@@ -1,10 +1,9 @@
-import { Document, Page, View, Text, PDFDownloadLink, Image, Font, pdf } from "@react-pdf/renderer";
+import { Document, Page, Font, pdf } from "@react-pdf/renderer";
 import { generateQR } from "../utils/generateQR";
 import { useState, useEffect, useRef } from "react";
-import logo from "../assets/brand-logo.jpg";
-import staticQr from "../assets/static-qr.png";
-import TopLine from "../assets/Top-line.png";
 import { addTrimMarksToPDF } from "./TrimMarksPDFLib";
+import TokenTemplate from "./TokenTemplate";
+import { useLayout } from "../context/LayoutProvider"
 
 // Import font files from npm package
 import montserratLight from "@fontsource/montserrat/files/montserrat-latin-300-normal.woff";
@@ -52,7 +51,7 @@ const chunk = (arr, size) =>
 const LoadingSpinner = ({ message, className = "" }) => (
   <button
     disabled
-    className={`w-48 h-10 flex items-center justify-center gap-2 bg-gray-400 text-white text-sm font-medium rounded-md cursor-not-allowed ${className}`}
+    className={`w-48 h-8 flex items-center justify-center gap-2 bg-gray-400 text-white text-sm font-medium rounded-md cursor-not-allowed ${className}`}
   >
     <span className="inline-block w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
     <span>{message}</span>
@@ -64,7 +63,7 @@ const DownloadButton = ({ onClick, disabled, isLoading }) => {
     return (
       <button
         disabled
-        className="w-48 h-10 flex items-center justify-center gap-2 bg-gray-400 text-white text-sm font-medium rounded-md cursor-not-allowed"
+        className="w-48 h-8 flex items-center justify-center gap-2 bg-gray-400 text-white text-sm font-medium rounded-md cursor-not-allowed"
       >
         <span className="inline-block w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
         <span>Generating PDF...</span>
@@ -84,183 +83,45 @@ const DownloadButton = ({ onClick, disabled, isLoading }) => {
   );
 };
 
-const CouponItem = ({ coupon, qrCode }) => (
-  <View
-    style={{
-      width: 119.07, // 42 mm
-      height: 212.63, // 75 mm
-      padding: 5,
-      paddingTop: 6,
-      paddingBottom: 8,
-      alignItems: "center",
-      justifyContent: "flex-start",
-      borderWidth: 0.75,
-      borderTopWidth: 0,
-      borderBottomWidth: 0,
-      borderColor: "#000",
-      display: "flex",
-    }}
-  >
-    <Image src={TopLine} style={{ width: 119.07, position: "absolute", top: 0 }} />
-    <Image src={logo} style={{ height: 20, marginBottom: 4 }} />
+const PDFDoc = ({ coupons, qrList, layout }) => {
+  const { paperWidth, paperHeight, couponWidth, couponHeight } = layout;
 
-    <Text
-      style={{
-        fontFamily: "Montserrat",
-        fontWeight: 600,
-        fontSize: 6.3,
-        marginBottom: 4,
-        textAlign: "left",
-        width: "100%",
-      }}
-    >
-      Scratch and scan for cashback
-    </Text>
-
-    <View
-      style={{
-        width: "100%",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "flex-start",
-      }}
-    >
-      {qrCode && (
-        <Image
-          src={qrCode}
+  return (
+    <Document>
+      {chunk(coupons, 42).map((pageCoupons, pageIndex) => (
+        <Page
+          key={pageIndex}
+          size={{ width: paperWidth, height: paperHeight }}
           style={{
-            width: "92%",
-            margin: 0,
-            padding: 0,
-          }}
-        />
-      )}
-
-      <Text
-        wrap={false}
-        style={{
-          fontFamily: "Montserrat",
-          fontWeight: 600,
-          fontSize: 5,
-          position: "absolute",
-          textAlign: "center",
-          left: "54.5%",
-          transform: "rotate(-90deg)",
-          width: 94,
-        }}
-      >
-        *For Technician use only
-      </Text>
-    </View>
-
-    <View
-      style={{
-        width: "100%",
-        flexDirection: "row",
-        alignItems: "flex-start",
-        justifyContent: "center",
-        marginTop: 4,
-        // gap: 2,
-        flex: 1,
-        // backgroundColor: "blue",
-      }}
-    >
-      <View
-        style={{
-          width: "50%",
-          height: "100%",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          // backgroundColor: "teal",
-          paddingRight: 5,
-          // padding: 2,
-          gap: 1,
-        }}
-      >
-        <Text
-          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            paddingHorizontal: 15.255,
+            paddingTop: 10.11,
+            paddingBottom: 10.11,
             fontFamily: "Montserrat",
-            fontWeight: 600,
-            fontSize: 4.4,
           }}
         >
-          *For Internal use only
-        </Text>
+          {pageCoupons.map((coupon, index) => {
+            const globalIndex = pageIndex * 42 + index;
 
-        <Image src={staticQr} style={{ width: "100%" }} />
-      </View>
-      <View
-        style={{
-          width: "50%",
-          height: "100%",
-          paddingLeft: 4,
-          flexDirection: "column",
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-          // backgroundColor: "red",
-        }}
-      >
-        <Text style={{ fontFamily: "Montserrat", fontWeight: 700, fontSize: 4.5 }}>
-          <Text style={{ fontFamily: "Montserrat", fontWeight: 600, fontStyle: "italic", fontSize: 4.5 }}>SKU Code</Text>
-          {"\n"}
-          <Text>
-            {(coupon?.["Product Code"] || "").slice(0, 8)}
-            {"\n"}
-            {(coupon?.["Product Code"] || "").slice(8)}
-          </Text>
-        </Text>
+            return (
+              <TokenTemplate
+                key={globalIndex}
+                coupon={coupon}
+                qrCode={qrList[globalIndex]}
+                couponWidth={couponWidth}
+                couponHeight={couponHeight}
+                globalIndex={globalIndex}
+              />
+            );
+          })}
+        </Page>
+      ))}
+    </Document>
+  );
+};
 
-        <Text style={{ fontFamily: "Montserrat", fontWeight: 700, fontSize: 4.5 }}>
-          <Text style={{ fontFamily: "Montserrat", fontWeight: 600, fontStyle: "italic", fontSize: 4.5 }}>SKU Name</Text>
-          {"\n"}
-          <Text>
-            {(coupon?.["Product Description"] || "").slice(0, 12)}
-            {"\n"}
-            {(coupon?.["Product Description"] || "").slice(13)}
-          </Text>
-        </Text>
 
-        <Text style={{ fontFamily: "Montserrat", fontWeight: 700, fontSize: 4.5 }}>
-          <Text style={{ fontFamily: "Montserrat", fontWeight: 600, fontStyle: "italic", fontSize: 4.5 }}>Internal Code</Text>
-          {"\n"}
-          <Text>
-            {(coupon?.["Internal Code"] || "").slice(0, 13)}
-            {"\n"}
-            {(coupon?.["Internal Code"] || "").slice(13)}
-          </Text>
-        </Text>
-      </View>
-    </View>
-    <Image src={TopLine} style={{ width: 119.07, position: "absolute", bottom: 0 }} />
-  </View>
-);
-
-const PDFDoc = ({ coupons, qrList }) => (
-  <Document>
-    {chunk(coupons, 42).map((pageCoupons, pageIndex) => (
-      <Page
-        key={pageIndex}
-        size={{ width: 864, height: 1296 }}
-        style={{
-          flexDirection: "row",
-          flexWrap: "wrap",
-          paddingHorizontal: 15.255,
-          paddingTop: 10.11,
-          paddingBottom: 10.11,
-          fontFamily: "Montserrat",
-        }}
-      >
-        {pageCoupons.map((coupon, index) => {
-          const globalIndex = pageIndex * 42 + index;
-          return (
-            <CouponItem key={globalIndex} coupon={coupon} qrCode={qrList[globalIndex]} globalIndex={globalIndex} />
-          );
-        })}
-      </Page>
-    ))}
-  </Document>
-);
 
 export default function GeneratePDF({ coupons, error }) {
   const [qrList, setQrList] = useState([]);
@@ -269,20 +130,32 @@ export default function GeneratePDF({ coupons, error }) {
   const [pdfBlob, setPdfBlob] = useState(null);
   const prevCouponsRef = useRef([]);
 
+  let layout = useLayout()
+  // const { paperWidth, paperHeight, couponWidth, couponHeight } = layout;
+  // let { paperWidth, paperHeight, couponWidth, couponHeight } = useLayout()
+
   // console.log(coupons); --> For testing of coupon data
 
   // Generate QR for ALL coupons so indexing matches across pages
+
+  useEffect(() => {
+    if (coupons.length === 0) {
+      prevCouponsRef.current = [];   // 🔥 reset internal cache
+    }
+  }, [coupons]);
+
   useEffect(() => {
     const loadQR = async () => {
-      if (JSON.stringify(coupons) === JSON.stringify(prevCouponsRef.current)) {
-        return;
-      }
-
       setIsReady(false);
+
       try {
-        const qrs = await Promise.all(coupons.map((c) => generateQR(JSON.stringify(c || {}))));
+        const qrs = await Promise.all(
+          coupons.map(c => generateQR(JSON.stringify(c || {})))
+        );
+
         setQrList(qrs);
         prevCouponsRef.current = coupons;
+
         setTimeout(() => setIsReady(true), 100);
       } catch (error) {
         console.error("Error generating QR codes:", error);
@@ -298,13 +171,14 @@ export default function GeneratePDF({ coupons, error }) {
     }
   }, [coupons]);
 
+
   // Generate PDF when ready
   useEffect(() => {
     const generatePDFWhenReady = async () => {
       if (isReady && qrList.length === coupons.length && coupons.length > 0) {
         setIsGenerating(true);
         try {
-          const blob = await pdf(<PDFDoc coupons={coupons} qrList={qrList} />).toBlob();
+          const blob = await pdf(<PDFDoc coupons={coupons} qrList={qrList} layout={layout} />).toBlob();
           const arrayBuffer = await blob.arrayBuffer();
           const pdfWithTrimMarks = await addTrimMarksToPDF(arrayBuffer);
           setPdfBlob(new Blob([pdfWithTrimMarks], { type: "application/pdf" }));

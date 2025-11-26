@@ -9,10 +9,18 @@ import GeneratePDF from "./GeneratePDF";
 const Panel = () => {
   const [coupons, setCoupons] = useState([]);
 
-  // Memoized handler to clear coupons
+  // // Memoized handler to clear coupons
+  // const handleRefresh = useCallback(() => {
+  //   setCoupons([]);
+  // }, []);
+
+  const [resetSignal, setResetSignal] = useState(false);
+
   const handleRefresh = useCallback(() => {
     setCoupons([]);
+    setResetSignal((prev) => !prev); // toggles true/false
   }, []);
+
 
   const hasCoupons = coupons.length > 0;
   return (
@@ -20,10 +28,10 @@ const Panel = () => {
       <div className="w-[28%] h-screen bg-amber-300">
         <div className='w-full bg-nero-800 text-nero-300 text-xl px-4 py-2'>Configuration</div>
         <div className="h-[calc(100vh-44px)] flex flex-col justify-start items-center text-4xl bg-nero-800 border-t-2 border-nero-900 text-nero-300">
-          <SizeConfigPanel />
+          <SizeConfigPanel handleRefresh={handleRefresh} />
           <MarginConfigPanel />
           <Orientation handleRefresh={handleRefresh} />
-          <UploadExcel setCoupons={setCoupons} hasCoupons={hasCoupons} couponsLength={coupons.length} coupons={coupons}/>
+          <UploadExcel setCoupons={setCoupons} resetSignal={resetSignal} hasCoupons={hasCoupons} couponsLength={coupons.length} coupons={coupons} />
         </div>
       </div>
     </>

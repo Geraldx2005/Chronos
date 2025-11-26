@@ -1,10 +1,10 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { CloudUpload } from "@mui/icons-material";
 import ExcelJS from "exceljs";
 import GeneratePDF from "./GeneratePDF";
 import ErrorBoundary from "./ErrorBoundary";
 
-export default function UploadExcel({ setCoupons, hasCoupons, couponsLength, coupons }) {
+export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, couponsLength, coupons }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
@@ -103,8 +103,15 @@ export default function UploadExcel({ setCoupons, hasCoupons, couponsLength, cou
 
   }, [parseExcelFile, setCoupons]);
 
+  useEffect(() => {
+    if (resetSignal && fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }, [resetSignal]);
+
+
   return (
-    <div className="w-full flex flex-col items-center gap-5">
+    <div className="w-full flex flex-col items-center gap-2">
       <div className="w-full p-3 flex flex-col justify-center items-center gap-1">
 
         {/* it is recommended to gernerate 100 pages which is 4200 coupons at a time */}
