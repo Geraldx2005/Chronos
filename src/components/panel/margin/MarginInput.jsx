@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 const MarginInput = ({ label }) => {
     const [value, setValue] = useState("0");
@@ -19,10 +21,24 @@ const MarginInput = ({ label }) => {
 
             <div className="w-full h-8 flex rounded-md">
                 {/* Left-side custom arrows */}
-                <div className="h-8 w-6 bg-nero-750 border border-nero-600 border-r-0  flex flex-col justify-center items-center rounded-bl-md rounded-tl-md">
-                    <button className="leading-none text-xs hover:text-nero-300 text-nero-400" type="button" onClick={increase}>▲</button>
-                    <button className="leading-none text-xs hover:text-nero-300 text-nero-400" type="button" onClick={decrease}>▼</button>
+                <div className="h-8 w-6 bg-nero-750 border border-nero-600 border-r-0 flex flex-col justify-center items-center rounded-bl-md rounded-tl-md">
+                    <button
+                        type="button"
+                        onClick={increase}
+                        className="h-4 pt-0.5 flex justify-center items-center leading-none text-nero-400 hover:text-nero-300"
+                    >
+                        <KeyboardArrowUpIcon sx={{ fontSize: 16, fontWeight: "bold" }} />
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={decrease}
+                        className="h-4 pb-0.5 flex justify-center items-center leading-none text-nero-400 hover:text-nero-300"
+                    >
+                        <KeyboardArrowDownIcon sx={{ fontSize: 16, fontWeight: "bold" }} />
+                    </button>
                 </div>
+
 
                 {/* Input */}
                 <input type="number" id="margin"

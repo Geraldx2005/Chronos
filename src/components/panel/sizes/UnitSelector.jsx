@@ -1,4 +1,5 @@
 import React from "react";
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 const UnitSelector = ({ label = "Units", value, onChange }) => {
     return (
@@ -19,7 +20,7 @@ const UnitSelector = ({ label = "Units", value, onChange }) => {
 
                 {/* Custom Arrow */}
                 <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-nero-300 text-xs">
-                    ▼
+                    <KeyboardArrowDownIcon className="text-nero-400"/>
                 </span>
             </div>
         </div>

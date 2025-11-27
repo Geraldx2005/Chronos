@@ -5,10 +5,15 @@ function RefreshBtn({ handleRefresh }) {
   return (
     <button
       onClick={handleRefresh}
-      className="flex justify-center items-center w-full h-10 bg-nero-750 border border-nero-600 text-nero-100 font-bold rounded-md transition-all duration-200 hover:bg-nero-700"
+      className="group flex justify-center items-center w-full h-8 bg-nero-700 border border-nero-600 text-nero-100 font-bold rounded-md transition-all duration-200"
     >
-      <AutorenewIcon fontSize="medium" className="text-nero-400" />
-      <span className="text-sm text-nero-400 font-medium pl-1">Reset</span>
+      <AutorenewIcon
+        fontSize="medium"
+        className="text-nero-400 group-hover:text-nero-300 transition-colors duration-200"
+      />
+      <span className="text-sm text-nero-400 font-medium pl-1 group-hover:text-nero-300 transition-colors duration-200">
+        Reset
+      </span>
     </button>
   );
 }
