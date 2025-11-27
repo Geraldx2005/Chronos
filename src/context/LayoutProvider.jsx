@@ -4,50 +4,28 @@ import { createContext, useContext, useState } from "react";
 const LayoutContext = createContext();
 
 export const LayoutProvider = ({ children }) => {
-  //
-  // UNITS (UI-level only)
-  //
+
+  // UNITS
   const [paperUnit, setPaperUnit] = useState("in");
   const [couponUnit, setCouponUnit] = useState("mm");
 
-  //
-  // INTERNAL SIZES — ALWAYS STORED IN POINTS (pt)
-  //
-  const [paperWidthPt, setPaperWidthPt] = useState(0);   // default: 12 in
-  const [paperHeightPt, setPaperHeightPt] = useState(0); // default: 18 in
+  // INTERNAL SIZES (pt)
+  const [paperWidthPt, setPaperWidthPt] = useState(0);
+  const [paperHeightPt, setPaperHeightPt] = useState(0);
 
-  const [couponWidthPt, setCouponWidthPt] = useState(0);  // 42 mm approx
-  const [couponHeightPt, setCouponHeightPt] = useState(0); // 75 mm approx
+  const [couponWidthPt, setCouponWidthPt] = useState(0);
+  const [couponHeightPt, setCouponHeightPt] = useState(0);
+
+  const layout = {
+    values: { paperUnit, couponUnit, paperWidthPt, paperHeightPt, couponWidthPt, couponHeightPt, },
+    set: { setPaperUnit, setCouponUnit, setPaperWidthPt, setPaperHeightPt, setCouponWidthPt, setCouponHeightPt, },
+  };
 
   return (
-    <LayoutContext.Provider
-      value={{
-        //
-        // UNITS
-        //
-        paperUnit,
-        setPaperUnit,
-        couponUnit,
-        setCouponUnit,
-
-        //
-        // INTERNAL PT VALUES
-        //
-        paperWidthPt,
-        setPaperWidthPt,
-        paperHeightPt,
-        setPaperHeightPt,
-
-        couponWidthPt,
-        setCouponWidthPt,
-        couponHeightPt,
-        setCouponHeightPt,
-      }}
-    >
+    <LayoutContext.Provider value={layout}>
       {children}
     </LayoutContext.Provider>
   );
 };
 
-// Custom hook for easy access
 export const useLayout = () => useContext(LayoutContext);

@@ -84,16 +84,16 @@ const DownloadButton = ({ onClick, disabled, isLoading }) => {
 };
 
 const PDFDoc = ({ coupons, qrList, layout }) => {
-  const { paperWidthPt, paperHeightPt, couponWidthPt, couponHeightPt } = layout;
+  const { values } = layout;
 
-  console.log(`paper width: ${paperWidthPt}, paper height: ${paperHeightPt}, coupon width: ${couponWidthPt}, coupon height:${couponHeightPt}`);
+  console.log(`paper width: ${values.paperWidthPt}, paper height: ${values.paperHeightPt}, coupon width: ${values.couponWidthPt}, coupon height:${values.couponHeightPt}`);
 
   return (
     <Document>
       {chunk(coupons, 42).map((pageCoupons, pageIndex) => (
         <Page
           key={pageIndex}
-          size={{ width: paperWidthPt, height: paperHeightPt }} // 12 x 18 in (for testing)
+          size={{ width: values.paperWidthPt, height: values.paperHeightPt }} // 12 x 18 in (for testing)
           style={{
             flexDirection: "row",
             flexWrap: "wrap",
@@ -111,8 +111,8 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
                 key={globalIndex}
                 coupon={coupon}
                 qrCode={qrList[globalIndex]}
-                couponWidthPt={couponWidthPt}
-                couponHeightPt={couponHeightPt}
+                couponWidthPt={values.couponWidthPt}
+                couponHeightPt={values.couponHeightPt}
                 globalIndex={globalIndex}
               />
             );

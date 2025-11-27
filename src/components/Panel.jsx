@@ -13,8 +13,9 @@ const Panel = () => {
 
   const handleRefresh = useCallback(() => {
     setCoupons([]);
-    setResetSignal((prev) => !prev); // toggles true/false
+    setResetSignal(Math.random()); // always forces re-render
   }, []);
+
 
 
   const hasCoupons = coupons.length > 0;

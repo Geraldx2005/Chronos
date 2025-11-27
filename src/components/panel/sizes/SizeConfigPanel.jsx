@@ -4,22 +4,7 @@ import { useLayout } from "../../../context/LayoutProvider";
 import { useEffect, useState } from "react";
 
 const SizeConfigPanel = ({ handleRefresh }) => {
-    const {
-        paperUnit,
-        setPaperUnit,
-        couponUnit,
-        setCouponUnit,
-
-        paperWidthPt,
-        paperHeightPt,
-        setPaperWidthPt,
-        setPaperHeightPt,
-
-        couponWidthPt,
-        couponHeightPt,
-        setCouponWidthPt,
-        setCouponHeightPt,
-    } = useLayout();
+    const layout = useLayout();
 
     // Unit conversions
     const mmToPt = (mm) => mm * 2.8346456693;
@@ -43,33 +28,33 @@ const SizeConfigPanel = ({ handleRefresh }) => {
     // Sync UI buffers when PT values or units change
     useEffect(() => {
         setPaperWidthInput(
-            paperUnit === "mm"
-                ? round(ptToMm(paperWidthPt))
-                : round(ptToIn(paperWidthPt))
+            layout.values.paperUnit === "mm"
+                ? round(ptToMm(layout.values.paperWidthPt))
+                : round(ptToIn(layout.values.paperWidthPt))
         );
         setPaperHeightInput(
-            paperUnit === "mm"
-                ? round(ptToMm(paperHeightPt))
-                : round(ptToIn(paperHeightPt))
+            layout.values.paperUnit === "mm"
+                ? round(ptToMm(layout.values.paperHeightPt))
+                : round(ptToIn(layout.values.paperHeightPt))
         );
 
         setCouponWidthInput(
-            couponUnit === "mm"
-                ? round(ptToMm(couponWidthPt))
-                : round(ptToIn(couponWidthPt))
+            layout.values.couponUnit === "mm"
+                ? round(ptToMm(layout.values.couponWidthPt))
+                : round(ptToIn(layout.values.couponWidthPt))
         );
         setCouponHeightInput(
-            couponUnit === "mm"
-                ? round(ptToMm(couponHeightPt))
-                : round(ptToIn(couponHeightPt))
+            layout.values.couponUnit === "mm"
+                ? round(ptToMm(layout.values.couponHeightPt))
+                : round(ptToIn(layout.values.couponHeightPt))
         );
     }, [
-        paperWidthPt,
-        paperHeightPt,
-        couponWidthPt,
-        couponHeightPt,
-        paperUnit,
-        couponUnit,
+        layout.values.paperWidthPt,
+        layout.values.paperHeightPt,
+        layout.values.couponWidthPt,
+        layout.values.couponHeightPt,
+        layout.values.paperUnit,
+        layout.values.couponUnit,
     ]);
 
     // ----------------------------
@@ -83,7 +68,7 @@ const SizeConfigPanel = ({ handleRefresh }) => {
         const num = Number(val);
         if (isNaN(num)) return;
 
-        setPaperWidthPt(paperUnit === "mm" ? mmToPt(num) : inToPt(num));
+        layout.set.setPaperWidthPt(layout.values.paperUnit === "mm" ? mmToPt(num) : inToPt(num));
         handleRefresh();
     };
 
@@ -94,7 +79,7 @@ const SizeConfigPanel = ({ handleRefresh }) => {
         const num = Number(val);
         if (isNaN(num)) return;
 
-        setPaperHeightPt(paperUnit === "mm" ? mmToPt(num) : inToPt(num));
+        layout.set.setPaperHeightPt(layout.values.paperUnit === "mm" ? mmToPt(num) : inToPt(num));
         handleRefresh();
     };
 
@@ -105,7 +90,7 @@ const SizeConfigPanel = ({ handleRefresh }) => {
         const num = Number(val);
         if (isNaN(num)) return;
 
-        setCouponWidthPt(couponUnit === "mm" ? mmToPt(num) : inToPt(num));
+        layout.set.setCouponWidthPt(layout.values.couponUnit === "mm" ? mmToPt(num) : inToPt(num));
         handleRefresh();
     };
 
@@ -116,7 +101,7 @@ const SizeConfigPanel = ({ handleRefresh }) => {
         const num = Number(val);
         if (isNaN(num)) return;
 
-        setCouponHeightPt(couponUnit === "mm" ? mmToPt(num) : inToPt(num));
+        layout.set.setCouponHeightPt(layout.values.couponUnit === "mm" ? mmToPt(num) : inToPt(num));
         handleRefresh();
     };
 
@@ -140,9 +125,9 @@ const SizeConfigPanel = ({ handleRefresh }) => {
                     />
 
                     <UnitSelector
-                        value={paperUnit}
+                        value={layout.values.paperUnit}
                         onChange={(val) => {
-                            setPaperUnit(val);
+                            layout.set.setPaperUnit(val);
                             handleRefresh();
                         }}
                     />
@@ -167,9 +152,9 @@ const SizeConfigPanel = ({ handleRefresh }) => {
                     />
 
                     <UnitSelector
-                        value={couponUnit}
+                        value={layout.values.couponUnit}
                         onChange={(val) => {
-                            setCouponUnit(val);
+                            layout.set.setCouponUnit(val);
                             handleRefresh();
                         }}
                     />
