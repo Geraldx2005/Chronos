@@ -54,6 +54,7 @@ const PresetHolder = () => {
               <PresetOption paperName={"A4"} width={210} height={297} />
               <PresetOption paperName={"A5"} width={148} height={210} />
               <PresetOption paperName={"A6"} width={105} height={148} />
+              <PresetOption paperName={"12 x 18"} width={304.8} height={457.2} />
             </motion.div>
           )}
 

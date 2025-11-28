@@ -3,8 +3,6 @@ import SizeConfigPanel from "./panel/sizes/SizeConfigPanel";
 import MarginConfigPanel from "./panel/margin/MarginConfigPanel";
 import Orientation from "./ui/Orientation";
 import UploadExcel from "./UploadExcel";
-import ErrorBoundary from "./ErrorBoundary";
-import GeneratePDF from "./GeneratePDF";
 
 const Panel = () => {
   const [coupons, setCoupons] = useState([]);
@@ -15,8 +13,6 @@ const Panel = () => {
     setCoupons([]);
     setResetSignal(Math.random()); // always forces re-render
   }, []);
-
-
 
   const hasCoupons = coupons.length > 0;
   return (
