@@ -26,7 +26,7 @@ const PresetHolder = () => {
       </div>
 
       {/* TABS */}
-      <div className="bg-nero-800 border-b-2 border-nero-900 minimal-scrollbar overflow-x-auto">
+      <div className="bg-nero-800 border-b-2 border-r-2 border-nero-900 minimal-scrollbar overflow-x-auto">
         <div className="flex items-center justify-center gap-6 px-4">
           {tabs.map((tab, index) => (
             <div

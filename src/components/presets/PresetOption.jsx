@@ -1,18 +1,24 @@
-import PresetImg from "../../assets/preset-img.svg";
 import { useLayout } from "../../context/LayoutProvider";
+import { useRefresh } from "../../context/RefreshContext";
+import PresetImg from "../../assets/preset-img.svg";
 
 const PresetOption = ({ paperName, width, height }) => {
   const layout = useLayout();
+  const { handleRefresh } = useRefresh();   // 👈 GET REFRESH HERE
 
   // conversion: mm ➜ pt
   const mmToPt = (mm) => mm * 2.8346456693;
 
   const applyPreset = () => {
+    // 1️⃣ update paper size
     layout.set.setPaperWidthPt(mmToPt(width));
     layout.set.setPaperHeightPt(mmToPt(height));
 
-    // optional: update unit to mm since presets are in mm
+    // 2️⃣ set units to mm
     layout.set.setPaperUnit("mm");
+
+    // 3️⃣ trigger global refresh
+    handleRefresh();
   };
 
   return (

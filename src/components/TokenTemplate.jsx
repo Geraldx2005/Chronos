@@ -3,6 +3,7 @@ import { View, Text, Image } from "@react-pdf/renderer";
 import logo from "../assets/brand-logo.jpg";
 import staticQr from "../assets/static-qr.png";
 import TopLine from "../assets/Top-line.png";
+import TechUseTxt from "../assets/tech-use.png";
 
 const TokenTemplate = ({ coupon, qrCode, couponWidthPt, couponHeightPt }) => (
     <View
@@ -21,93 +22,43 @@ const TokenTemplate = ({ coupon, qrCode, couponWidthPt, couponHeightPt }) => (
             alignItems: "center",
             justifyContent: "flex-start",
             borderWidth: 0.75,
-            borderTopWidth: 0,
-            borderBottomWidth: 0,
+            borderTopWidth: 2,
+            borderBottomWidth: 2,
             borderColor: "#000",
             display: "flex",
         }}
     >
-        <Image src={TopLine} style={{ width: 119.07, position: "absolute", top: 0 }} />
+        {/* <Image src={TopLine} style={{ width: 119.07, position: "absolute", top: 0 }} /> */}
         <Image src={logo} style={{ height: 20, marginBottom: 4 }} />
 
         <Text
-            style={{
-                fontFamily: "Montserrat",
-                fontWeight: 600,
-                fontSize: 6.3,
-                marginBottom: 4,
-                textAlign: "left",
-                width: "100%",
-            }}
-        >
+            style={{ fontFamily: "Montserrat", fontWeight: 600, fontSize: 6.3, marginBottom: 4, textAlign: "left", width: "100%", }}>
             Scratch and scan for cashback
         </Text>
 
         <View
-            style={{
-                width: "100%",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "flex-start",
-            }}
-        >
-            {qrCode && (
-                <Image
-                    src={qrCode}
-                    style={{
-                        width: "92%",
-                        margin: 0,
-                        padding: 0,
-                    }}
-                />
-            )}
+            style={{ width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "center", }}>
+            <View
+                style={{ width: "92%", height: "100%", alignItems: "center", justifyContent: "center" }}>
+                {qrCode && (<Image src={qrCode} style={{ width: "100%", margin: 0, padding: 0, }} />)}
+            </View>
 
-            <Text
-                wrap={false}
-                style={{
-                    fontFamily: "Montserrat",
-                    fontWeight: 600,
-                    fontSize: 5,
-                    position: "absolute",
-                    textAlign: "center",
-                    left: "54.5%",
-                    transform: "rotate(-90deg)",
-                    width: 94,
-                }}
-            >
-                *For Technician use only
-            </Text>
+
+            <View
+                style={{ width: "8%", height: "100%", display: "flex", justifyContent: "center", alignItems: "flex-end", }}>
+                <Image
+                    src={TechUseTxt}
+                    style={{ width: "60%", margin: 0, padding: 0, }} />
+            </View>
         </View>
 
         <View
-            style={{
-                width: "100%",
-                flexDirection: "row",
-                alignItems: "flex-start",
-                justifyContent: "center",
-                marginTop: 4,
-                flex: 1,
-            }}
-        >
+            style={{ width: "100%", flexDirection: "row", alignItems: "flex-start", justifyContent: "center", marginTop: 4, flex: 1, }}>
             {/* LEFT PART */}
             <View
-                style={{
-                    width: "50%",
-                    height: "100%",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    paddingRight: 5,
-                    gap: 1,
-                }}
-            >
+                style={{ width: "50%", height: "100%", flexDirection: "column", alignItems: "center", justifyContent: "center", paddingRight: 5, gap: 1, }}>
                 <Text
-                    style={{
-                        fontFamily: "Montserrat",
-                        fontWeight: 600,
-                        fontSize: 4.4,
-                    }}
-                >
+                    style={{ fontFamily: "Montserrat", fontWeight: 600, fontSize: 4.4, }}>
                     *For Internal use only
                 </Text>
 
@@ -116,15 +67,7 @@ const TokenTemplate = ({ coupon, qrCode, couponWidthPt, couponHeightPt }) => (
 
             {/* RIGHT PART */}
             <View
-                style={{
-                    width: "50%",
-                    height: "100%",
-                    paddingLeft: 4,
-                    flexDirection: "column",
-                    alignItems: "flex-start",
-                    justifyContent: "space-between",
-                }}
-            >
+                style={{ width: "50%", height: "100%", paddingLeft: 4, flexDirection: "column", alignItems: "flex-start", justifyContent: "space-between", }}>
                 {/* SKU Code */}
                 <Text style={{ fontFamily: "Montserrat", fontWeight: 700, fontSize: 4.5 }}>
                     <Text style={{ fontFamily: "Montserrat", fontWeight: 600, fontStyle: "italic", fontSize: 4.5 }}>
@@ -166,7 +109,7 @@ const TokenTemplate = ({ coupon, qrCode, couponWidthPt, couponHeightPt }) => (
             </View>
         </View>
 
-        <Image src={TopLine} style={{ width: 119.07, position: "absolute", bottom: 0 }} />
+        {/* <Image src={TopLine} style={{ width: 119.07, position: "absolute", bottom: 0 }} /> */}
     </View>
 );
 

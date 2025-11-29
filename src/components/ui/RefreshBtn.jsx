@@ -1,6 +1,8 @@
 import AutorenewIcon from "@mui/icons-material/Autorenew";
+import { useRefresh } from "../../context/RefreshContext";
 
-function RefreshBtn({ handleRefresh }) {
+function RefreshBtn() {
+  const { handleRefresh } = useRefresh();
 
   return (
     <button

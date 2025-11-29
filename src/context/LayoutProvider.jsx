@@ -6,7 +6,7 @@ const LayoutContext = createContext();
 export const LayoutProvider = ({ children }) => {
 
   // UNITS
-  const [paperUnit, setPaperUnit] = useState("in");
+  const [paperUnit, setPaperUnit] = useState("mm");
   const [couponUnit, setCouponUnit] = useState("mm");
 
   // INTERNAL SIZES (pt)
@@ -16,9 +16,11 @@ export const LayoutProvider = ({ children }) => {
   const [couponWidthPt, setCouponWidthPt] = useState(0);
   const [couponHeightPt, setCouponHeightPt] = useState(0);
 
+  const [orientation, setOrientation] = useState("portrait");
+
   const layout = {
-    values: { paperUnit, couponUnit, paperWidthPt, paperHeightPt, couponWidthPt, couponHeightPt, },
-    set: { setPaperUnit, setCouponUnit, setPaperWidthPt, setPaperHeightPt, setCouponWidthPt, setCouponHeightPt, },
+    values: { paperUnit, couponUnit, paperWidthPt, paperHeightPt, couponWidthPt, couponHeightPt, orientation, },
+    set: { setPaperUnit, setCouponUnit, setPaperWidthPt, setPaperHeightPt, setCouponWidthPt, setCouponHeightPt, setOrientation, },
   };
 
   return (

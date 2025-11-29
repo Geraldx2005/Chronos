@@ -1,10 +1,12 @@
-import SizeInput from "./SizeInput";
-import UnitSelector from "./UnitSelector";
-import { useLayout } from "../../../context/LayoutProvider";
 import { useEffect, useState } from "react";
+import { useLayout } from "../../../context/LayoutProvider";
+import { useRefresh } from "../../../context/RefreshContext";
+import UnitSelector from "./UnitSelector";
+import SizeInput from "./SizeInput";
 
-const SizeConfigPanel = ({ handleRefresh }) => {
+const SizeConfigPanel = () => {
     const layout = useLayout();
+    const { handleRefresh } = useRefresh();
 
     // Unit conversions
     const mmToPt = (mm) => mm * 2.8346456693;
@@ -15,10 +17,7 @@ const SizeConfigPanel = ({ handleRefresh }) => {
 
     const round = (n) => Number(n.toFixed(3));
 
-    // ----------------------------
     // TEMPORARY UI INPUT STATES
-    // ----------------------------
-
     const [paperWidthInput, setPaperWidthInput] = useState("");
     const [paperHeightInput, setPaperHeightInput] = useState("");
 
@@ -57,10 +56,7 @@ const SizeConfigPanel = ({ handleRefresh }) => {
         layout.values.couponUnit,
     ]);
 
-    // ----------------------------
     // CHANGE HANDLERS (NO FLICKER)
-    // ----------------------------
-
     const handlePaperWidthChange = (val) => {
         setPaperWidthInput(val);
 
