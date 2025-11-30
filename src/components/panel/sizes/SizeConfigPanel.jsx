@@ -17,7 +17,7 @@ const SizeConfigPanel = () => {
 
     const round = (n) => Number(n.toFixed(3));
 
-    // TEMPORARY UI INPUT STATES
+    // Temporary UI input states
     const [paperWidthInput, setPaperWidthInput] = useState("");
     const [paperHeightInput, setPaperHeightInput] = useState("");
 
@@ -56,7 +56,15 @@ const SizeConfigPanel = () => {
         layout.values.couponUnit,
     ]);
 
-    // CHANGE HANDLERS (NO FLICKER)
+    // fontScale always stays synced.
+    useEffect(() => {
+        if (layout.values.couponWidthPt > 0) {
+            updateFontScale(layout.values.couponWidthPt);
+        }
+    }, [layout.values.couponWidthPt]);
+
+
+    // Change handlers (No flickering)
     const handlePaperWidthChange = (val) => {
         setPaperWidthInput(val);
 
@@ -86,7 +94,15 @@ const SizeConfigPanel = () => {
         const num = Number(val);
         if (isNaN(num)) return;
 
-        layout.set.setCouponWidthPt(layout.values.couponUnit === "mm" ? mmToPt(num) : inToPt(num));
+        // Convert to pt based on unit
+        const widthPt =
+            layout.values.couponUnit === "mm" ? mmToPt(num) : inToPt(num);
+
+        layout.set.setCouponWidthPt(widthPt);
+
+        // Update Font Scale
+        updateFontScale(widthPt);
+
         handleRefresh();
     };
 
@@ -101,9 +117,19 @@ const SizeConfigPanel = () => {
         handleRefresh();
     };
 
+    // Base width reference for scaling
+    const BASE_COUPON_WIDTH_PT = 120;
+
+    // Updates the font scale inside LayoutContext
+    const updateFontScale = (widthPt) => {
+        if (!widthPt) return;
+        const scale = widthPt / BASE_COUPON_WIDTH_PT;
+        layout.set.setFontScale(scale);
+    };
+
     return (
         <div className="w-full flex flex-col gap-4 p-3 border-b-2 border-nero-900">
-            {/* PAGE SIZE */}
+            {/* Page Size */}
             <div className="flex flex-col gap-1">
                 <h2 className="text-lg text-nero-400 font-medium">Page Size</h2>
 
@@ -130,7 +156,7 @@ const SizeConfigPanel = () => {
                 </div>
             </div>
 
-            {/* COUPON SIZE */}
+            {/* Coupon Size */}
             <div className="flex flex-col gap-1">
                 <h2 className="text-lg text-nero-400 font-medium">Coupon Size</h2>
 

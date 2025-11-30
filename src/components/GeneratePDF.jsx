@@ -87,7 +87,8 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
   const { values } = layout;
 
   console.log(`paper width: ${values.paperWidthPt}, paper height: ${values.paperHeightPt}, coupon width: ${values.couponWidthPt}, coupon height:${values.couponHeightPt}`);
-
+  console.log(`font scale: ${values.fontScale}`);
+  
   return (
     <Document>
       {chunk(coupons, 42).map((pageCoupons, pageIndex) => (
@@ -95,6 +96,9 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
           key={pageIndex}
           size={{ width: values.paperWidthPt, height: values.paperHeightPt }} // 12 x 18 in (for testing)
           style={{
+            display: "flex",
+            // justifyContent: "space-between",
+            alignItems: "flex-start",
             flexDirection: "row",
             flexWrap: "wrap",
             paddingHorizontal: 15.255,
@@ -113,6 +117,7 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
                 qrCode={qrList[globalIndex]}
                 couponWidthPt={values.couponWidthPt}
                 couponHeightPt={values.couponHeightPt}
+                fontSize={5 * values.fontScale}
                 globalIndex={globalIndex}
               />
             );
