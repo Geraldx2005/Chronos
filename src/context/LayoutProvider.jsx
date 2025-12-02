@@ -23,9 +23,15 @@ export const LayoutProvider = ({ children }) => {
   // Font Scale
   const [fontScale, setFontScale] = useState(1);
 
+  // Margin
+  const [rightMargin, setRightMargin] = useState(0);
+  const [leftMargin, setLeftMargin] = useState(0);
+  const [topMargin, setTopMargin] = useState(0);
+  const [bottomMargin, setBottomMargin] = useState(0);
+
   const layout = {
-    values: { paperUnit, couponUnit, paperWidthPt, paperHeightPt, couponWidthPt, couponHeightPt, orientation, fontScale },
-    set: { setPaperUnit, setCouponUnit, setPaperWidthPt, setPaperHeightPt, setCouponWidthPt, setCouponHeightPt, setOrientation, setFontScale },
+    values: { paperUnit, couponUnit, paperWidthPt, paperHeightPt, couponWidthPt, couponHeightPt, orientation, fontScale, rightMargin, leftMargin, topMargin, bottomMargin },
+    set: { setPaperUnit, setCouponUnit, setPaperWidthPt, setPaperHeightPt, setCouponWidthPt, setCouponHeightPt, setOrientation, setFontScale, setRightMargin, setLeftMargin, setTopMargin, setBottomMargin },
   };
 
   return (

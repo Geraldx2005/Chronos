@@ -31,7 +31,7 @@ const TokenTemplate = ({ coupon, qrCode, couponWidthPt, couponHeightPt, fontSize
       }}
     >
       {/* Logo */}
-      <Image src={logo} style={{ height: 20, marginBottom: 4 }} />
+      <Image src={logo} style={{ width: "70%", marginBottom: 4 }} />
 
       {/* Heading */}
       <Text
@@ -73,7 +73,7 @@ const TokenTemplate = ({ coupon, qrCode, couponWidthPt, couponHeightPt, fontSize
 
         {/* RIGHT */}
         <View
-          style={{ width: "50%", height: "100%", paddingLeft: 4, flexDirection: "column", alignItems: "flex-start", justifyContent: "space-between", }}>
+          style={{ width: "50%", height: "100%", paddingLeft: 4, flexDirection: "column", alignItems: "flex-start", justifyContent: "center", gap: 3.5, }}>
           {/* SKU Code */}
           <Text
             style={{ fontFamily: "Montserrat", fontWeight: 700, fontSize: valueSize, }}>
