@@ -109,8 +109,8 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
 
 
   return (
-    <div className="w-full flex flex-col items-center gap-2">
-      <div className="w-full p-3 flex flex-col justify-center items-center gap-1">
+    <div className="w-full flex flex-col items-center">
+      <div className="w-full p-3 pb-1 flex flex-col justify-center items-center gap-1">
 
         {/* it is recommended to gernerate 100 pages which is 4200 coupons at a time */}
         <input
