@@ -1,14 +1,13 @@
-// GeneratePDF.jsx (with dynamic marginX + marginY reduction)
-
 import { Document, Page, Font, pdf, View } from "@react-pdf/renderer";
 import { generateQR } from "../utils/generateQR";
 import { useState, useEffect } from "react";
-import { addTrimMarksToPDF } from "./TrimMarksPDFLib";
-import TokenTemplate from "./TokenTemplate";
+import { addTrimMarksToPDF } from "../utils/TrimMarksPDFLib";
+import TokenTemplate from "../utils/TokenTemplate";
 import { useLayout } from "../context/LayoutProvider";
 import mergePDFBuffers from "../utils/mergePDFBuffers";
-import ProgressBar from "./ProgressBar";
+import ProgressBar from "../utils/ProgressBar";
 import { useRefresh } from "../context/RefreshContext";
+import Toast from "../utils/Toast";
 
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -18,7 +17,7 @@ import montserratSemiBold from "@fontsource/montserrat/files/montserrat-latin-60
 import montserratSemiBoldItalic from "@fontsource/montserrat/files/montserrat-latin-600-italic.woff";
 import montserratBold from "@fontsource/montserrat/files/montserrat-latin-700-normal.woff";
 
-// register fonts
+// register fonts once
 let fontsRegistered = false;
 if (!fontsRegistered) {
   Font.register({
@@ -34,7 +33,7 @@ if (!fontsRegistered) {
   fontsRegistered = true;
 }
 
-// AUTO MARGINS + dynamic correction for both axes
+// Auto-margins
 function computeAutoMargins(layout) {
   const {
     paperWidthPt,
@@ -54,20 +53,21 @@ function computeAutoMargins(layout) {
   let marginX = Math.max(0, (paperWidthPt - usedW) / 2);
   let marginY = Math.max(0, (paperHeightPt - usedH) / 2);
 
-  // Dynamic reduction for both axes
   const reduceX = paperWidthPt * 0.00008;
   const reduceY = paperHeightPt * 0.00008;
 
   marginX -= reduceX;
   marginY -= reduceY;
 
-  layout.set.setLeftMargin(marginX);
-  layout.set.setRightMargin(marginX);
-  layout.set.setTopMargin(marginY);
-  layout.set.setBottomMargin(marginY);
+  if (!layout.values.userMarginOverride) {
+    layout.set.setLeftMargin(marginX);
+    layout.set.setRightMargin(marginX);
+    layout.set.setTopMargin(marginY);
+    layout.set.setBottomMargin(marginY);
+  }
 }
 
-// Coupon Renderer
+// PDF page renderer
 const PDFDoc = ({ coupons, qrList, layout }) => {
   const { values } = layout;
   const {
@@ -104,7 +104,6 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
         >
           {pageCoupons.map((coupon, i) => {
             const globalIndex = pIndex * perPage + i;
-
             const row = Math.floor(i / columns);
             const col = i % columns;
 
@@ -165,7 +164,7 @@ const calculatePerPage = (layout) => {
   return cols * rows;
 };
 
-// Main Component
+// Main component
 export default function GeneratePDF({ coupons, error }) {
   const { resetSignal } = useRefresh();
 
@@ -176,8 +175,12 @@ export default function GeneratePDF({ coupons, error }) {
   const [progress, setProgress] = useState(0);
   const [phase, setPhase] = useState("qr");
 
+  const [showToast, setShowToast] = useState(false);
+  const [toastMsg, setToastMsg] = useState("");
+
   const layout = useLayout();
 
+  // Reset cycle
   useEffect(() => {
     setProgress(0);
     setPhase("qr");
@@ -187,6 +190,7 @@ export default function GeneratePDF({ coupons, error }) {
     setIsGenerating(false);
   }, [resetSignal]);
 
+  // Auto margin
   useEffect(() => {
     computeAutoMargins(layout);
   }, [
@@ -194,6 +198,7 @@ export default function GeneratePDF({ coupons, error }) {
     layout.values.paperHeightPt,
     layout.values.couponWidthPt,
     layout.values.couponHeightPt,
+    layout.values.userMarginOverride,
   ]);
 
   // QR generation
@@ -272,7 +277,14 @@ export default function GeneratePDF({ coupons, error }) {
     <div className="w-full flex flex-col items-center gap-4">
       <AnimatePresence mode="wait">
         {(phase === "qr" || phase === "pdf") && (
-          <ProgressBar progress={progress} phase={phase} />
+          <ProgressBar
+            progress={progress}
+            phase={phase}
+            onComplete={() => {
+              setToastMsg("PDF Generated!");
+              setShowToast(true);
+            }}
+          />
         )}
       </AnimatePresence>
 
@@ -284,7 +296,7 @@ export default function GeneratePDF({ coupons, error }) {
             exit={{ opacity: 0 }}
           >
             <button
-              className="w-48 h-8 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-md text-white bg-denim-600 hover:bg-denim-700 active:scale-95 transition-all duration-200 ease"
+              className="w-48 h-8 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-md text-white bg-denim-600 hover:bg-denim-700 active:scale-95 transition-all duration-200 ease-in-out"
               onClick={() => {
                 const url = URL.createObjectURL(pdfBlob);
                 const a = document.createElement("a");
@@ -296,10 +308,15 @@ export default function GeneratePDF({ coupons, error }) {
             >
               Download
             </button>
-
           </motion.div>
         )}
       </AnimatePresence>
+
+      <Toast
+        message={toastMsg}
+        show={showToast}
+        onClose={() => setShowToast(false)}
+      />
     </div>
   );
 }

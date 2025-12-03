@@ -11,12 +11,12 @@ const Panel = () => {
 
   return (
     <>
-      <div className="w-[28%] h-screen bg-amber-300">
+      <div className="w-[28%] h-screen bg-nero-700">
         <div className='w-full bg-nero-800 text-nero-300 text-xl px-4 py-2'>
           Configuration
         </div>
 
-        <div className="h-[calc(100vh-44px)] flex flex-col justify-start items-center bg-nero-800 border-t-2 border-nero-900 text-nero-300">
+        <div className="resize w-full h-[calc(100vh-44px)] flex flex-col justify-start items-center bg-nero-800 border-t-2 border-nero-900 text-nero-300">
           <SizeConfigPanel />
           <MarginConfigPanel />
           <Orientation />

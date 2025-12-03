@@ -1,7 +1,23 @@
 import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
 
-export default function ProgressBar({ progress, phase }) {
+export default function ProgressBar({ progress, phase, onComplete }) {
     const isLoading = progress < 100;
+
+    // prevent re-trigger
+    const hasCompletedRef = useRef(false);
+
+    useEffect(() => {
+        if (progress === 100 && !hasCompletedRef.current) {
+            hasCompletedRef.current = true;
+            onComplete && onComplete();
+        }
+
+        // reset when progress goes back down (new job)
+        if (progress < 100) {
+            hasCompletedRef.current = false;
+        }
+    }, [progress, onComplete]);
 
     return (
         <motion.div
@@ -34,8 +50,8 @@ export default function ProgressBar({ progress, phase }) {
                     {progress >= 100
                         ? "Completed!"
                         : phase === "qr"
-                        ? "Generating QR Codes..."
-                        : "Generating PDF..."}
+                            ? "Generating QR Codes..."
+                            : "Generating PDF..."}
                 </div>
             </div>
         </motion.div>

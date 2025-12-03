@@ -1,13 +1,31 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { CloudUpload } from "@mui/icons-material";
 import ExcelJS from "exceljs";
 import GeneratePDF from "./GeneratePDF";
-import ErrorBoundary from "./ErrorBoundary";
+import ErrorBoundary from "../utils/ErrorBoundary";
+import Toast from "../utils/Toast";
+import { useLayout } from "../context/LayoutProvider";
 
 export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, couponsLength, coupons }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
+
+  // Toast
+  const [toastMsg, setToastMsg] = useState("");
+  const [showToast, setShowToast] = useState(false);
+  const triggerToast = (msg) => {
+    setToastMsg(msg);
+    setShowToast(true);
+  };
+
+  // layout sizes
+  const { values } = useLayout();
+  const {
+    paperWidthPt,
+    paperHeightPt,
+    couponWidthPt,
+    couponHeightPt,
+  } = values;
 
   const parseExcelFile = useCallback(async (file) => {
     try {
@@ -23,12 +41,10 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
       const headers = [];
       const firstRow = worksheet.getRow(1);
 
-      // Extract headers
       firstRow.eachCell((cell, colNumber) => {
         headers[colNumber] = cell.value?.toString().trim() || `Column${colNumber}`;
       });
 
-      // Extract data rows
       const data = [];
       for (let rowNumber = 2; rowNumber <= worksheet.rowCount; rowNumber++) {
         const row = worksheet.getRow(rowNumber);
@@ -66,13 +82,10 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.name.match(/\.(xlsx|xls)$/i)) {
       setError("Pls upload a valid file (.xlsx)");
-
       setCoupons([]);
 
-      // Clear the invalid file
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -87,18 +100,14 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
       setCoupons(data);
     } catch (err) {
       setError(err.message);
-      setCoupons([]); // <--- important
-      console.error("Error processing Excel file:", err);
+      setCoupons([]);
 
-      // Only clear if error
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
-
     } finally {
       setIsLoading(false);
     }
-
   }, [parseExcelFile, setCoupons]);
 
   useEffect(() => {
@@ -107,23 +116,42 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
     }
   }, [resetSignal]);
 
-
   return (
     <div className="w-full flex flex-col items-center">
       <div className="w-full p-3 pb-1 flex flex-col justify-center items-center gap-1">
 
-        {/* it is recommended to gernerate 100 pages which is 4200 coupons at a time */}
         <input
           ref={fileInputRef}
           className="w-full h-12 p-2 flex items-center cursor-pointer bg-nero-800 border border-default-medium text-heading text-sm rounded-md focus:ring-brand focus:border-brand placeholder:text-body"
           id="file_input"
-          onChange={handleFile}
           accept=".xlsx,.xls"
           disabled={isLoading}
           type="file"
+          onClick={(e) => {
+            const noPaper = !paperWidthPt || !paperHeightPt;
+            const noCoupon = !couponWidthPt || !couponHeightPt;
+
+            if (noPaper && noCoupon) {
+              e.preventDefault();
+              triggerToast("Please set both paper and coupon size");
+              return;
+            }
+
+            if (noPaper) {
+              e.preventDefault();
+              triggerToast("Please set a paper size");
+              return;
+            }
+
+            if (noCoupon) {
+              e.preventDefault();
+              triggerToast("Please set a coupon size");
+              return;
+            }
+          }}
+          onChange={handleFile}
         />
 
-        {/* Shows a count of the number of coupons */}
         {!error && hasCoupons && (
           <div className="w-full flex justify-start items-center px-2">
             <h1 className="text-[14px] text-nero-300">
@@ -132,7 +160,6 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
           </div>
         )}
 
-        {/* Error message (If something goes wrong*/}
         {error && (
           <div className="w-[90%] text-red-200 text-sm text-center py-0 px-2 rounded-md border border-red-200">
             {error}
@@ -143,6 +170,12 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
       <ErrorBoundary>
         <GeneratePDF coupons={coupons} errror={error} />
       </ErrorBoundary>
+
+      <Toast
+        message={toastMsg}
+        show={showToast}
+        onClose={() => setShowToast(false)}
+      />
     </div>
   );
 }
