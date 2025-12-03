@@ -15,7 +15,7 @@ const MarginInput = ({ label }) => {
 
     return (
         <div className="w-[50%] flex flex-col gap-0.5">
-            <label htmlFor="margin" className="text-sm font-medium">
+            <label htmlFor="margin" className="text-sm text-nero-400 font-medium">
                 {label}
             </label>
 

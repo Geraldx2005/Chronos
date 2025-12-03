@@ -1,3 +1,5 @@
+// GeneratePDF.jsx (with dynamic marginX + marginY reduction)
+
 import { Document, Page, Font, pdf, View } from "@react-pdf/renderer";
 import { generateQR } from "../utils/generateQR";
 import { useState, useEffect } from "react";
@@ -16,7 +18,7 @@ import montserratSemiBold from "@fontsource/montserrat/files/montserrat-latin-60
 import montserratSemiBoldItalic from "@fontsource/montserrat/files/montserrat-latin-600-italic.woff";
 import montserratBold from "@fontsource/montserrat/files/montserrat-latin-700-normal.woff";
 
-// Register fonts
+// register fonts
 let fontsRegistered = false;
 if (!fontsRegistered) {
   Font.register({
@@ -32,18 +34,7 @@ if (!fontsRegistered) {
   fontsRegistered = true;
 }
 
-const DownloadButton = ({ onClick }) => (
-  <button
-    onClick={onClick}
-    className="w-48 h-8 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-md text-white bg-denim-600 hover:bg-denim-700 active:scale-95"
-  >
-    Download
-  </button>
-);
-
-// ----------------------------
-// Auto Margin Logic
-// ----------------------------
+// AUTO MARGINS + dynamic correction for both axes
 function computeAutoMargins(layout) {
   const {
     paperWidthPt,
@@ -57,27 +48,26 @@ function computeAutoMargins(layout) {
   const cols = Math.floor(paperWidthPt / couponWidthPt);
   const rows = Math.floor(paperHeightPt / couponHeightPt);
 
-  const fullWidth = cols * couponWidthPt;
-  const fullHeight = rows * couponHeightPt;
+  const usedW = cols * couponWidthPt;
+  const usedH = rows * couponHeightPt;
 
-  let marginX = (paperWidthPt - fullWidth) / 2;
-  let marginY = (paperHeightPt - fullHeight) / 2;
+  let marginX = Math.max(0, (paperWidthPt - usedW) / 2);
+  let marginY = Math.max(0, (paperHeightPt - usedH) / 2);
 
-  marginX = Math.max(0, Math.round(marginX * 10) / 10);
-  marginY = Math.max(0, Math.round(marginY * 10) / 10);
+  // Dynamic reduction for both axes
+  const reduceX = paperWidthPt * 0.00008;
+  const reduceY = paperHeightPt * 0.00008;
 
-  marginX = 10;
-  marginX = 15;
-  
+  marginX -= reduceX;
+  marginY -= reduceY;
+
   layout.set.setLeftMargin(marginX);
   layout.set.setRightMargin(marginX);
   layout.set.setTopMargin(marginY);
   layout.set.setBottomMargin(marginY);
 }
 
-// ----------------------------
-// ABSOLUTE GRID PDF RENDERER
-// ----------------------------
+// COUPON RENDERER
 const PDFDoc = ({ coupons, qrList, layout }) => {
   const { values } = layout;
   const {
@@ -99,7 +89,6 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
   const rows = Math.max(1, Math.floor(usableH / couponHeightPt));
   const perPage = columns * rows;
 
-  // Split pages
   const pages = [];
   for (let i = 0; i < coupons.length; i += perPage) {
     pages.push(coupons.slice(i, i + perPage));
@@ -111,17 +100,8 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
         <Page
           key={pIndex}
           size={{ width: paperWidthPt, height: paperHeightPt }}
-          style={{
-            position: "relative",
-            width: paperWidthPt,
-            height: paperHeightPt,
-
-            // NO FLEX — PERFECT precision
-            padding: 0,
-            margin: 0,
-          }}
+          style={{ position: "relative" }}
         >
-
           {pageCoupons.map((coupon, i) => {
             const globalIndex = pIndex * perPage + i;
 
@@ -152,14 +132,12 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
               </View>
             );
           })}
-
         </Page>
       ))}
     </Document>
   );
 };
 
-// ----------------------------
 const split = (arr, size) => {
   const out = [];
   for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
@@ -181,15 +159,13 @@ const calculatePerPage = (layout) => {
   const usableW = paperWidthPt - leftMargin - rightMargin;
   const usableH = paperHeightPt - topMargin - bottomMargin;
 
-  const cols = Math.max(1, Math.floor(usableW / couponWidthPt));
-  const rows = Math.max(1, Math.floor(usableH / couponHeightPt));
+  const cols = Math.floor(usableW / couponWidthPt);
+  const rows = Math.floor(usableH / couponHeightPt);
 
   return cols * rows;
 };
 
-// ----------------------------
 // MAIN COMPONENT
-// ----------------------------
 export default function GeneratePDF({ coupons, error }) {
   const { resetSignal } = useRefresh();
 
@@ -220,32 +196,25 @@ export default function GeneratePDF({ coupons, error }) {
     layout.values.couponHeightPt,
   ]);
 
-  // QR GENERATION
+  // QR generation
   useEffect(() => {
     const generateQRs = async () => {
-      if (coupons.length === 0) return;
+      if (!coupons.length) return;
 
       setProgress(0);
       setPhase("qr");
 
-      const OUTER = 100;
-      const YIELD = 10;
-
-      const batches = split(coupons, OUTER);
+      const batches = split(coupons, 100);
       const temp = [];
 
-      for (let b = 0; b < batches.length; b++) {
-        const batch = batches[b];
-
-        for (let i = 0; i < batch.length; i++) {
-          const qr = await generateQR(JSON.stringify(batch[i] || {}));
+      for (let batch of batches) {
+        for (let coupon of batch) {
+          const qr = await generateQR(JSON.stringify(coupon || {}));
           temp.push(qr);
 
-          if (i % YIELD === 0) {
-            const pct = Math.round((temp.length / coupons.length) * 50);
-            setProgress(pct);
-            await new Promise((r) => setTimeout(r, 0));
-          }
+          const pct = Math.round((temp.length / coupons.length) * 50);
+          setProgress(pct);
+          await new Promise((r) => setTimeout(r, 0));
         }
       }
 
@@ -257,7 +226,7 @@ export default function GeneratePDF({ coupons, error }) {
     generateQRs();
   }, [coupons]);
 
-  // PDF GENERATION
+  // PDF generation
   useEffect(() => {
     const generatePDF = async () => {
       if (!isReady || qrList.length !== coupons.length) return;
@@ -297,40 +266,40 @@ export default function GeneratePDF({ coupons, error }) {
     generatePDF();
   }, [isReady, qrList]);
 
-  const handleDownload = () => {
-    const url = URL.createObjectURL(pdfBlob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "coupons.pdf";
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  if (coupons.length === 0 || error) return null;
+  if (!coupons.length || error) return null;
 
   return (
     <div className="w-full flex flex-col items-center gap-4">
-
       <AnimatePresence mode="wait">
         {(phase === "qr" || phase === "pdf") && (
-          <ProgressBar key="loader" progress={progress} phase={phase} />
+          <ProgressBar progress={progress} phase={phase} />
         )}
       </AnimatePresence>
 
       <AnimatePresence mode="wait">
         {pdfBlob && (
           <motion.div
-            key="downloadBtn"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
           >
-            <DownloadButton onClick={handleDownload} />
+            <button
+              className="w-48 h-8 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-md text-white bg-denim-600 hover:bg-denim-700 active:scale-95 transition-all duration-200 ease"
+              onClick={() => {
+                const url = URL.createObjectURL(pdfBlob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "coupons.pdf";
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+            >
+              Download
+            </button>
+
           </motion.div>
         )}
       </AnimatePresence>
-
     </div>
   );
 }

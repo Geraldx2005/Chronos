@@ -1,9 +1,9 @@
+// ----------------------------------------------
+// TrimMarksPDFLib.jsx (FINAL - dynamic marginX + marginY reduction)
+// ----------------------------------------------
+
 import { PDFDocument, rgb } from "pdf-lib";
 
-/**
- * pdfBytes: original PDF buffer
- * layout: layout.values passed from React
- */
 export const addTrimMarksToPDF = async (pdfBytes, layout) => {
   try {
     const pdfDoc = await PDFDocument.load(pdfBytes);
@@ -20,6 +20,10 @@ export const addTrimMarksToPDF = async (pdfBytes, layout) => {
       bottomMargin,
     } = layout;
 
+    // dynamic reduction same as GeneratePDF
+    const reduceX = paperWidthPt * 0.00008;
+    const reduceY = paperHeightPt * 0.00008;
+
     pages.forEach((page) => {
       addDynamicTrimMarks(
         page,
@@ -27,10 +31,12 @@ export const addTrimMarksToPDF = async (pdfBytes, layout) => {
         paperHeightPt,
         couponWidthPt,
         couponHeightPt,
-        leftMargin,
-        rightMargin,
-        topMargin,
-        bottomMargin
+
+        // updated margins (apply same correction)
+        leftMargin - reduceX,
+        rightMargin - reduceX,
+        topMargin - reduceY,
+        bottomMargin - reduceY
       );
     });
 
@@ -41,7 +47,10 @@ export const addTrimMarksToPDF = async (pdfBytes, layout) => {
   }
 };
 
-const addDynamicTrimMarks = (
+// ----------------------------------------------
+// TRIM MARK DRAWER
+// ----------------------------------------------
+function addDynamicTrimMarks(
   page,
   pageWidth,
   pageHeight,
@@ -51,61 +60,54 @@ const addDynamicTrimMarks = (
   rightMargin,
   topMargin,
   bottomMargin
-) => {
+) {
   const thickness = 0.7;
-  const len = 12; // trim mark length
+  const len = 12;
 
-  const usableWidth = pageWidth - leftMargin - rightMargin;
-  const usableHeight = pageHeight - topMargin - bottomMargin;
+  const cols = Math.floor(pageWidth / couponWidth);
+  const rows = Math.floor(pageHeight / couponHeight);
 
-  const columns = Math.floor(usableWidth / couponWidth);
-  const rows = Math.floor(usableHeight / couponHeight);
+  const blockLeft = leftMargin;
+  const blockRight = leftMargin + cols * couponWidth;
 
-  // ---------------------------------------------------------
-  // VERTICAL trim marks beside coupon columns
-  // ---------------------------------------------------------
-  for (let c = 0; c <= columns; c++) {
-    const x = leftMargin + c * couponWidth;
+  const blockTop = topMargin;
+  const blockBottom = topMargin + rows * couponHeight;
 
-    // Upper small mark near the coupon top
+  // vertical marks
+  for (let c = 0; c <= cols; c++) {
+    const x = blockLeft + c * couponWidth;
+
     page.drawLine({
-      start: { x, y: topMargin - len },
-      end: { x, y: topMargin },
+      start: { x, y: blockTop - len },
+      end: { x, y: blockTop },
       thickness,
       color: rgb(0, 0, 0),
     });
 
-    // Lower small mark near the coupon bottom
-    const yBottom = topMargin + rows * couponHeight;
     page.drawLine({
-      start: { x, y: yBottom },
-      end: { x, y: yBottom + len },
+      start: { x, y: blockBottom },
+      end: { x, y: blockBottom + len },
       thickness,
       color: rgb(0, 0, 0),
     });
   }
 
-  // ---------------------------------------------------------
-  // HORIZONTAL trim marks beside coupon rows
-  // ---------------------------------------------------------
+  // horizontal marks
   for (let r = 0; r <= rows; r++) {
-    const y = topMargin + r * couponHeight;
+    const y = blockTop + r * couponHeight;
 
-    // Left side mark (near coupons)
     page.drawLine({
-      start: { x: leftMargin - len, y },
-      end: { x: leftMargin, y },
+      start: { x: blockLeft - len, y },
+      end: { x: blockLeft, y },
       thickness,
       color: rgb(0, 0, 0),
     });
 
-    // Right side mark
-    const xRight = leftMargin + columns * couponWidth;
     page.drawLine({
-      start: { x: xRight, y },
-      end: { x: xRight + len, y },
+      start: { x: blockRight, y },
+      end: { x: blockRight + len, y },
       thickness,
       color: rgb(0, 0, 0),
     });
   }
-};
+}

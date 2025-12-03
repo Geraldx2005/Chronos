@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 
 export default function ProgressBar({ progress, phase }) {
+    const isLoading = progress < 100;
+
     return (
         <motion.div
             key="progressBar"
@@ -19,10 +21,16 @@ export default function ProgressBar({ progress, phase }) {
                         />
                     </div>
 
-                    <span className="w-10 flex justify-center items-center">{progress}%</span>
+                    <span className="w-10 flex justify-center text-nero-300 items-center">
+                        {progress}%
+                    </span>
                 </div>
 
-                <div className="text-gray-200 text-sm">
+                <div className="text-nero-300 text-sm flex items-center gap-1.5">
+                    {isLoading && (
+                        <div className="w-3 h-3 border-2 border-nero-500 border-t-transparent rounded-full animate-spin" />
+                    )}
+
                     {progress >= 100
                         ? "Completed!"
                         : phase === "qr"
