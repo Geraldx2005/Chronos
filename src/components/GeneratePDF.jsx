@@ -67,7 +67,7 @@ function computeAutoMargins(layout) {
   layout.set.setBottomMargin(marginY);
 }
 
-// COUPON RENDERER
+// Coupon Renderer
 const PDFDoc = ({ coupons, qrList, layout }) => {
   const { values } = layout;
   const {
@@ -165,7 +165,7 @@ const calculatePerPage = (layout) => {
   return cols * rows;
 };
 
-// MAIN COMPONENT
+// Main Component
 export default function GeneratePDF({ coupons, error }) {
   const { resetSignal } = useRefresh();
 
