@@ -13,11 +13,19 @@ export default function ProgressBar({ progress, phase, onComplete }) {
             onComplete && onComplete();
         }
 
-        // reset when progress goes back down (new job)
         if (progress < 100) {
             hasCompletedRef.current = false;
         }
     }, [progress, onComplete]);
+
+    // Phase label
+    const getLabel = () => {
+        if (progress >= 100) return "Completed!";
+        if (phase === "qr") return "Generating QR Codes...";
+        if (phase === "pdf") return "Generating PDF...";
+        if (phase === "merge") return "Merging PDF...";
+        return "Working...";
+    };
 
     return (
         <motion.div
@@ -47,11 +55,7 @@ export default function ProgressBar({ progress, phase, onComplete }) {
                         <div className="w-3 h-3 border-2 border-nero-500 border-t-transparent rounded-full animate-spin" />
                     )}
 
-                    {progress >= 100
-                        ? "Completed!"
-                        : phase === "qr"
-                            ? "Generating QR Codes..."
-                            : "Generating PDF..."}
+                    {getLabel()}
                 </div>
             </div>
         </motion.div>
