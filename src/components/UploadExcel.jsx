@@ -10,15 +10,14 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
 
-  // Toast
   const [toastMsg, setToastMsg] = useState("");
   const [showToast, setShowToast] = useState(false);
+
   const triggerToast = (msg) => {
     setToastMsg(msg);
     setShowToast(true);
   };
 
-  // layout sizes
   const { values } = useLayout();
   const {
     paperWidthPt,
@@ -83,7 +82,7 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
     if (!file) return;
 
     if (!file.name.match(/\.(xlsx|xls)$/i)) {
-      setError("Pls upload a valid file (.xlsx)");
+      setError("Please upload a valid file (.xlsx)");
       setCoupons([]);
 
       if (fileInputRef.current) {
@@ -97,6 +96,7 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
 
     try {
       const data = await parseExcelFile(file);
+
       setCoupons(data);
     } catch (err) {
       setError(err.message);
@@ -168,7 +168,7 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
       </div>
 
       <ErrorBoundary>
-        <GeneratePDF coupons={coupons} errror={error} />
+        <GeneratePDF coupons={coupons} error={error} />
       </ErrorBoundary>
 
       <Toast

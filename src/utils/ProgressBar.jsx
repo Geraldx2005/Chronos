@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 export default function ProgressBar({ progress, phase, onComplete }) {
     const isLoading = progress < 100;
 
-    // prevent re-trigger
     const hasCompletedRef = useRef(false);
 
     useEffect(() => {
@@ -18,12 +17,13 @@ export default function ProgressBar({ progress, phase, onComplete }) {
         }
     }, [progress, onComplete]);
 
-    // Phase label
     const getLabel = () => {
         if (progress >= 100) return "Completed!";
+
         if (phase === "qr") return "Generating QR Codes...";
         if (phase === "pdf") return "Generating PDF...";
         if (phase === "merge") return "Merging PDF...";
+
         return "Working...";
     };
 

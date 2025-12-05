@@ -30,14 +30,15 @@ const PresetHolder = () => {
   );
 
   return (
-    <div className="w-[72%] h-screen">
+    <div className="w-full sm:w-[50%] md:w-[60%] lg:w-[67%] xl:w-[72%] h-screen">
       <div className="w-full bg-nero-800 border-b-2 border-r-2 border-nero-900 text-nero-300 text-xl px-4 py-2">
         Presets
       </div>
 
-      {/* TABS */}
+      {/* Tabs */}
       <div className="bg-nero-800 border-b-2 border-r-2 border-nero-900 minimal-scrollbar overflow-x-auto">
-        <div className="flex items-center justify-center gap-6 px-4">
+        <div
+          className="flex items-center px-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-1 w-max mx-auto lg:mx-auto md:mx-0">
           {tabs.map((tab, index) => (
             <div
               key={index}
@@ -49,6 +50,7 @@ const PresetHolder = () => {
           ))}
         </div>
       </div>
+
 
       {/* CONTENT */}
       <div className="minimal-scrollbar w-full h-[calc(100vh-96px)] overflow-auto flex flex-col relative">

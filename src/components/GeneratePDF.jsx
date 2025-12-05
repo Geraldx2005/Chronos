@@ -1,4 +1,4 @@
-import { Document, Page, Font, pdf, View } from "@react-pdf/renderer";
+import { Document, Page, pdf, View } from "@react-pdf/renderer";
 import { generateQR } from "../utils/generateQR";
 import { useState, useEffect } from "react";
 import { addTrimMarksToPDF } from "../utils/TrimMarksPDFLib";
@@ -11,27 +11,6 @@ import Toast from "../utils/Toast";
 
 import { AnimatePresence, motion } from "framer-motion";
 
-import montserratLight from "@fontsource/montserrat/files/montserrat-latin-300-normal.woff";
-import montserratRegular from "@fontsource/montserrat/files/montserrat-latin-400-normal.woff";
-import montserratSemiBold from "@fontsource/montserrat/files/montserrat-latin-600-normal.woff";
-import montserratSemiBoldItalic from "@fontsource/montserrat/files/montserrat-latin-600-italic.woff";
-import montserratBold from "@fontsource/montserrat/files/montserrat-latin-700-normal.woff";
-
-let fontsRegistered = false;
-if (!fontsRegistered) {
-  Font.register({
-    family: "Montserrat",
-    fonts: [
-      { src: montserratLight, fontWeight: 300 },
-      { src: montserratRegular, fontWeight: 400 },
-      { src: montserratSemiBold, fontWeight: 600 },
-      { src: montserratSemiBoldItalic, fontWeight: 600, fontStyle: "italic" },
-      { src: montserratBold, fontWeight: 700 },
-    ],
-  });
-  fontsRegistered = true;
-}
-
 function computeAutoMargins(layout) {
   const {
     paperWidthPt,
@@ -40,7 +19,8 @@ function computeAutoMargins(layout) {
     couponHeightPt,
   } = layout.values;
 
-  if (!paperWidthPt || !paperHeightPt || !couponWidthPt || !couponHeightPt) return;
+  if (!paperWidthPt || !paperHeightPt || !couponWidthPt || !couponHeightPt)
+    return;
 
   const cols = Math.floor(paperWidthPt / couponWidthPt);
   const rows = Math.floor(paperHeightPt / couponHeightPt);
@@ -117,7 +97,7 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
               >
                 <TokenTemplate
                   coupon={coupon}
-                  qrCode={qrList[globalIndex]}
+                  qrCode={qrList[globalIndex] || null}
                   couponWidthPt={couponWidthPt}
                   couponHeightPt={couponHeightPt}
                   fontSize={5 * fontScale}
@@ -207,7 +187,13 @@ export default function GeneratePDF({ coupons, error }) {
 
       for (let b of batches) {
         for (let coupon of b) {
-          const qr = await generateQR(JSON.stringify(coupon || {}));
+          if (!coupon.qrCode) {
+            temp.push(null);
+            setProgress(Math.round((temp.length / coupons.length) * 50));
+            continue;
+          }
+
+          const qr = await generateQR(coupon.qrCode.toString());
           temp.push(qr);
 
           setProgress(Math.round((temp.length / coupons.length) * 50));
@@ -249,7 +235,6 @@ export default function GeneratePDF({ coupons, error }) {
         buffers.push(trimmed);
       }
 
-      // MERGING STEP (shown only in ProgressBar)
       setPhase("merge");
       setProgress(95);
 
@@ -270,14 +255,12 @@ export default function GeneratePDF({ coupons, error }) {
 
   return (
     <div className="w-full flex flex-col items-center gap-4">
-      {/* PROGRESS BAR */}
       <AnimatePresence mode="wait">
         {(phase === "qr" || phase === "pdf" || phase === "merge") && (
           <ProgressBar progress={progress} phase={phase} />
         )}
       </AnimatePresence>
 
-      {/* DOWNLOAD BUTTON (simple, no spinner) */}
       <AnimatePresence>
         {pdfBlob && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>

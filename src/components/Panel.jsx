@@ -11,7 +11,9 @@ const Panel = () => {
 
   return (
     <>
-      <div className="w-[28%] h-screen bg-nero-700">
+      <div
+        className="w-full sm:w-[50%] md:w-[40%] lg:w-[33%] xl:w-[28%] h-screen bg-nero-700"
+      >
         <div className='w-full bg-nero-800 text-nero-300 text-xl px-4 py-2'>
           Configuration
         </div>

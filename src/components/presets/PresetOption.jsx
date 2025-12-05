@@ -9,9 +9,17 @@ const PresetOption = ({ paperName, width, height, selected, onSelect }) => {
   const mmToPt = (mm) => mm * 2.8346456693;
 
   const applyPreset = () => {
+    // ⭐ Tell UI that a preset is updating values
+    layout.set.setPresetUpdate(true);
+
+    // Always set unit to mm
+    layout.set.setPaperUnit("mm");
+
+    // Convert mm → pt
     layout.set.setPaperWidthPt(mmToPt(width));
     layout.set.setPaperHeightPt(mmToPt(height));
-    layout.set.setPaperUnit("mm");
+
+    // Refresh layout
     handleRefresh();
   };
 
@@ -30,10 +38,7 @@ const PresetOption = ({ paperName, width, height, selected, onSelect }) => {
         }
       `}
     >
-      <img
-        src={PresetImg}
-        className="w-24 h-24 flex items-center justify-center rounded-md"
-      />
+      <img src={PresetImg} className="w-24 h-24 rounded-md" />
 
       <span className="flex flex-col justify-center items-center text-sm font-semibold">
         <h4 className="text-base">{paperName}</h4>

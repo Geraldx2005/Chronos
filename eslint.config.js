@@ -41,6 +41,9 @@ export default defineConfig([
       'no-extra-boolean-cast': 'off',
       'no-case-declarations': 'off',
       'no-prototype-builtins': 'off',
+
+      // Disable Fast Refresh's "export components only" rule
+      'react-refresh/only-export-components': 'off',
     },
   },
 ])

@@ -22,8 +22,10 @@ export const LayoutProvider = ({ children }) => {
   const [topMargin, setTopMargin] = useState(0);
   const [bottomMargin, setBottomMargin] = useState(0);
 
-  // NEW — detects if user manually edited margins
   const [userMarginOverride, setUserMarginOverride] = useState(false);
+
+  // ⭐ NEW — tells SizeConfigPanel that a preset updated sizes
+  const [presetUpdate, setPresetUpdate] = useState(false);
 
   const layout = {
     values: {
@@ -40,6 +42,7 @@ export const LayoutProvider = ({ children }) => {
       topMargin,
       bottomMargin,
       userMarginOverride,
+      presetUpdate,        // ⭐ include it
     },
 
     set: {
@@ -55,8 +58,9 @@ export const LayoutProvider = ({ children }) => {
       setLeftMargin,
       setTopMargin,
       setBottomMargin,
+      setUserMarginOverride,
 
-      setUserMarginOverride, // NEW
+      setPresetUpdate,     // ⭐ include setter
     },
   };
 
