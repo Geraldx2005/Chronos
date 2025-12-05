@@ -10,7 +10,6 @@ const SizeConfigPanel = () => {
 
     const mmToPt = (mm) => mm * 2.8346456693;
     const ptToMm = (pt) => pt / 2.8346456693;
-
     const inToPt = (inch) => inch * 72;
 
     // PURE INPUTS
@@ -19,6 +18,14 @@ const SizeConfigPanel = () => {
     const [couponWidthInput, setCouponWidthInput] = useState("");
     const [couponHeightInput, setCouponHeightInput] = useState("");
 
+    // ⭐ Sync initial values on first load
+    useEffect(() => {
+        setPaperWidthInput("0");
+        setPaperHeightInput("0");
+        setCouponWidthInput("0");
+        setCouponHeightInput("0");
+    }, []);
+
     // ⭐ Only sync UI when preset update occurs
     useEffect(() => {
         if (!layout.values.presetUpdate) return;
@@ -26,9 +33,7 @@ const SizeConfigPanel = () => {
         setPaperWidthInput(ptToMm(layout.values.paperWidthPt).toFixed(2));
         setPaperHeightInput(ptToMm(layout.values.paperHeightPt).toFixed(2));
 
-        // Reset flag
         layout.set.setPresetUpdate(false);
-
     }, [
         layout.values.paperWidthPt,
         layout.values.paperHeightPt,
@@ -81,9 +86,7 @@ const SizeConfigPanel = () => {
         handleRefresh();
     };
 
-    // -----------------------------------------
-    // UNIT SWITCH (DO NOT REWRITE INPUTS)
-    // -----------------------------------------
+    // UNIT SWITCHERS
     const handlePaperUnitChange = (newUnit) => {
         layout.set.setPaperUnit(newUnit);
 

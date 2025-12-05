@@ -1,6 +1,6 @@
 import { Document, Page, pdf, View } from "@react-pdf/renderer";
 import { generateQR } from "../utils/generateQR";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { addTrimMarksToPDF } from "../utils/TrimMarksPDFLib";
 import TokenTemplate from "../utils/TokenTemplate";
 import { useLayout } from "../context/LayoutProvider";
@@ -141,7 +141,7 @@ const calculatePerPage = (layout) => {
 export default function GeneratePDF({ coupons, error }) {
   const { resetSignal } = useRefresh();
 
-  const [qrList, setQrList] = useState([]);
+  const qrListRef = useRef([]); // 🔥 performance optimized storage
   const [pdfBlob, setPdfBlob] = useState(null);
 
   const [isReady, setIsReady] = useState(false);
@@ -159,7 +159,7 @@ export default function GeneratePDF({ coupons, error }) {
     setProgress(0);
     setPhase("qr");
     setPdfBlob(null);
-    setQrList([]);
+    qrListRef.current = []; // reset
     setIsReady(false);
     setIsGenerating(false);
   }, [resetSignal]);
@@ -174,7 +174,7 @@ export default function GeneratePDF({ coupons, error }) {
     layout.values.userMarginOverride,
   ]);
 
-  // QR GENERATION
+  // QR GENERATION (optimized)
   useEffect(() => {
     const run = async () => {
       if (!coupons.length) return;
@@ -201,7 +201,7 @@ export default function GeneratePDF({ coupons, error }) {
         }
       }
 
-      setQrList(temp);
+      qrListRef.current = temp; // 🔥 no rerenders
       setProgress(50);
       setIsReady(true);
     };
@@ -212,14 +212,14 @@ export default function GeneratePDF({ coupons, error }) {
   // PAGE GENERATION + MERGING
   useEffect(() => {
     const run = async () => {
-      if (!isReady || qrList.length !== coupons.length) return;
+      if (!isReady || qrListRef.current.length !== coupons.length) return;
 
       setIsGenerating(true);
       setPhase("pdf");
 
       const perPage = calculatePerPage(layout);
       const couponPages = split(coupons, perPage);
-      const qrPages = split(qrList, perPage);
+      const qrPages = split(qrListRef.current, perPage);
 
       const buffers = [];
 
@@ -249,7 +249,7 @@ export default function GeneratePDF({ coupons, error }) {
     };
 
     run();
-  }, [isReady, qrList]);
+  }, [isReady, coupons, layout.values]);
 
   if (!coupons.length || error) return null;
 

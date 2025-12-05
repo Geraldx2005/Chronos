@@ -1,6 +1,7 @@
 import { useLayout } from "../../context/LayoutProvider";
 import { useRefresh } from "../../context/RefreshContext";
-import PresetImg from "../../assets/preset-img.svg";
+import PresetPortraitImg from "../../assets/preset-portrait-img.svg";
+import PresetLandscapeImg from "../../assets/preset-landscape-img.svg";
 
 const PresetOption = ({ paperName, width, height, selected, onSelect }) => {
   const layout = useLayout();
@@ -19,9 +20,12 @@ const PresetOption = ({ paperName, width, height, selected, onSelect }) => {
     layout.set.setPaperWidthPt(mmToPt(width));
     layout.set.setPaperHeightPt(mmToPt(height));
 
-    // Refresh layout
+    // Refresh layout after update
     handleRefresh();
   };
+
+  // 🖼️ Choose orientation image automatically
+  const previewImg = width > height ? PresetLandscapeImg : PresetPortraitImg;
 
   return (
     <button
@@ -38,7 +42,8 @@ const PresetOption = ({ paperName, width, height, selected, onSelect }) => {
         }
       `}
     >
-      <img src={PresetImg} className="w-24 h-24 rounded-md" />
+      {/* Dynamic preview image */}
+      <img src={previewImg} className="w-24 h-24 rounded-md" />
 
       <span className="flex flex-col justify-center items-center text-sm font-semibold">
         <h4 className="text-base">{paperName}</h4>
