@@ -1,4 +1,4 @@
-# 🕒 **Chronos**
+# **Chronos**
 ### High-Performance Coupon Generation Engine
 
 <div align="center">
@@ -15,7 +15,7 @@ Engineered for **speed**, **precision**, and **print-shop reliability**.
 
 ---
 
-## ✨ Features
+## Features
 
 ### 🔹 Smart Coupon Layout Engine
 - Automatically calculates rows, columns, and margins  
@@ -36,14 +36,14 @@ Engineered for **speed**, **precision**, and **print-shop reliability**.
 
 ---
 
-## 📄 License
+## License
 MIT License — free for both commercial and personal use.
 
 ---
 
-## 👨‍💻 Author
+## Author
 Created by **Gerald** — building high-performance, production-ready tools.
 
 ---
 
-# 🚀 Chronos — Built for Precision, Speed & Scale.
+# Chronos — Built for Precision, Speed & Scale.
