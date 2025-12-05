@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLayout } from "../../../context/LayoutProvider";
 import { useRefresh } from "../../../context/RefreshContext";
 import UnitSelector from "./UnitSelector";
@@ -12,13 +12,20 @@ const SizeConfigPanel = () => {
     const ptToMm = (pt) => pt / 2.8346456693;
     const inToPt = (inch) => inch * 72;
 
+    // ⭐ CLEAN FORMATTER — removes unnecessary decimals
+    const cleanNumber = (num) => {
+        if (num == null || isNaN(num)) return "0";
+        const rounded = parseFloat(num.toFixed(2));
+        return Number.isInteger(rounded) ? rounded.toString() : rounded.toString();
+    };
+
     // PURE INPUTS
     const [paperWidthInput, setPaperWidthInput] = useState("");
     const [paperHeightInput, setPaperHeightInput] = useState("");
     const [couponWidthInput, setCouponWidthInput] = useState("");
     const [couponHeightInput, setCouponHeightInput] = useState("");
 
-    // ⭐ Sync initial values on first load
+    // Sync initial values
     useEffect(() => {
         setPaperWidthInput("0");
         setPaperHeightInput("0");
@@ -26,12 +33,16 @@ const SizeConfigPanel = () => {
         setCouponHeightInput("0");
     }, []);
 
-    // ⭐ Only sync UI when preset update occurs
+    // ⭐ Sync values when preset updates
     useEffect(() => {
         if (!layout.values.presetUpdate) return;
 
-        setPaperWidthInput(ptToMm(layout.values.paperWidthPt).toFixed(2));
-        setPaperHeightInput(ptToMm(layout.values.paperHeightPt).toFixed(2));
+        setPaperWidthInput(
+            cleanNumber(ptToMm(layout.values.paperWidthPt))
+        );
+        setPaperHeightInput(
+            cleanNumber(ptToMm(layout.values.paperHeightPt))
+        );
 
         layout.set.setPresetUpdate(false);
     }, [
@@ -128,10 +139,20 @@ const SizeConfigPanel = () => {
                 <h2 className="text-lg text-nero-400 font-medium">Page Size</h2>
 
                 <div className="w-full flex items-center gap-2">
-                    <SizeInput label="Width" value={paperWidthInput} onValueChange={handlePaperWidthChange} />
-                    <SizeInput label="Height" value={paperHeightInput} onValueChange={handlePaperHeightChange} />
-
-                    <UnitSelector value={layout.values.paperUnit} onChange={handlePaperUnitChange} />
+                    <SizeInput
+                        label="Width"
+                        value={paperWidthInput}
+                        onValueChange={handlePaperWidthChange}
+                    />
+                    <SizeInput
+                        label="Height"
+                        value={paperHeightInput}
+                        onValueChange={handlePaperHeightChange}
+                    />
+                    <UnitSelector
+                        value={layout.values.paperUnit}
+                        onChange={handlePaperUnitChange}
+                    />
                 </div>
             </div>
 
@@ -139,10 +160,20 @@ const SizeConfigPanel = () => {
                 <h2 className="text-lg text-nero-400 font-medium">Coupon Size</h2>
 
                 <div className="w-full flex items-center gap-2">
-                    <SizeInput label="Width" value={couponWidthInput} onValueChange={handleCouponWidthChange} />
-                    <SizeInput label="Height" value={couponHeightInput} onValueChange={handleCouponHeightChange} />
-
-                    <UnitSelector value={layout.values.couponUnit} onChange={handleCouponUnitChange} />
+                    <SizeInput
+                        label="Width"
+                        value={couponWidthInput}
+                        onValueChange={handleCouponWidthChange}
+                    />
+                    <SizeInput
+                        label="Height"
+                        value={couponHeightInput}
+                        onValueChange={handleCouponHeightChange}
+                    />
+                    <UnitSelector
+                        value={layout.values.couponUnit}
+                        onChange={handleCouponUnitChange}
+                    />
                 </div>
             </div>
         </div>
