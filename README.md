@@ -2,7 +2,6 @@
 ### High-Performance Coupon Generation Engine
 
 <div align="center">
-  <img src="https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge" />
   <img src="https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react&logoColor=white" />
   <img src="https://img.shields.io/badge/PDF%20Renderer-@react--pdf-black?style=for-the-badge&logo=adobe&logoColor=white" />
   <img src="https://img.shields.io/badge/Framer%20Motion-Animation-purple?style=for-the-badge&logo=framer" />
