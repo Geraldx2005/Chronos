@@ -1,3 +1,4 @@
+// PresetOption.jsx FIXED
 import { useLayout } from "../../context/LayoutProvider";
 import { useRefresh } from "../../context/RefreshContext";
 import PresetPortraitImg from "../../assets/preset-portrait-img.svg";
@@ -10,21 +11,23 @@ const PresetOption = ({ paperName, width, height, selected, onSelect }) => {
   const mmToPt = (mm) => mm * 2.8346456693;
 
   const applyPreset = () => {
-    // ⭐ Tell UI that a preset is updating values
+    // UI knows preset is updating
     layout.set.setPresetUpdate(true);
 
-    // Always set unit to mm
+    // force mm
     layout.set.setPaperUnit("mm");
 
-    // Convert mm → pt
+    // assign paper size
     layout.set.setPaperWidthPt(mmToPt(width));
     layout.set.setPaperHeightPt(mmToPt(height));
 
-    // Refresh layout after update
+    // full reset: clear coupons + resetSignal + reset upload UI
     handleRefresh();
+
+    // ALSO reset coupon size UI values (if needed)
+    layout.set.setUserMarginOverride(false);
   };
 
-  // 🖼️ Choose orientation image automatically
   const previewImg = width > height ? PresetLandscapeImg : PresetPortraitImg;
 
   return (
@@ -34,19 +37,21 @@ const PresetOption = ({ paperName, width, height, selected, onSelect }) => {
         applyPreset();
       }}
       className={`
-        w-full h-full flex flex-col items-center justify-center p-4 gap-4 rounded-md
-        transition-colors duration-150
-        ${selected
+    group
+    w-full h-full flex flex-col items-center justify-center p-4 gap-4 rounded-md
+    transition-colors duration-150 focus:outline-none
+    ${selected
           ? "ring-3 ring-denim-600 ring-inset bg-[#2b2b2b]"
           : "bg-nero-800 hover:bg-[#2b2b2b] ring-0"
         }
-      `}
+  `}
     >
-      {/* Dynamic preview image */}
       <img src={previewImg} className="w-24 h-24 rounded-md" />
 
       <span className="flex flex-col justify-center items-center text-sm font-semibold">
-        <h4 className="text-base">{paperName}</h4>
+        <h4 className="text-base group-hover:text-denim-400 transition-colors duration-150">
+          {paperName}
+        </h4>
         <h4 className="font-medium">{`${width} x ${height} mm`}</h4>
       </span>
     </button>

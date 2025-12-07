@@ -28,7 +28,7 @@ const Orientation = () => {
   };
 
   return (
-    <div className="w-full p-3 flex justify-center items-center gap-4 border-b-2 border-nero-900">
+    <div className="w-full p-2.5 flex justify-center items-center gap-4 border-b-2 bg-nero-800 border-nero-900">
       <div className="w-[70%] flex">
         <div className="w-full h-8 flex rounded-md">
           {/* Label */}

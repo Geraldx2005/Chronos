@@ -7,7 +7,7 @@ function RefreshBtn() {
   return (
     <button
       onClick={handleRefresh}
-      className="group flex justify-center items-center w-full h-8 bg-nero-700 border border-nero-600 text-nero-100 font-bold rounded-md transition-all duration-200"
+      className="group flex justify-center items-center w-full h-8 bg-nero-700 border border-nero-600 text-nero-100 font-bold rounded-md transition-all duration-200 focus:outline-none focus:ring-1 focus:border-nero-400"
     >
       <AutorenewIcon
         fontSize="medium"

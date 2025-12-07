@@ -1,36 +1,66 @@
-// ErrorBoundary.jsx
-import { Component } from 'react';
+// ErrorBoundary.jsx — Self-contained toast version (NO Toast import)
+import { Component } from "react";
 
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = {
+      hasError: false,
+      showToast: false,
+    };
   }
 
   static getDerivedStateFromError(error) {
-    return { hasError: true, error };
+    return { hasError: true };
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('Error caught by boundary:', error, errorInfo);
+    console.error("PDF Error:", error, errorInfo);
+
+    // show toast
+    this.setState({ showToast: true });
+  }
+
+  closeToast = () => {
+    this.setState({
+      hasError: false,
+      showToast: false,
+    });
+  };
+
+  renderToast() {
+    if (!this.state.showToast) return null;
+
+    return (
+      <div
+        className="
+          fixed bottom-6 left-1/2 -translate-x-1/2 z-50
+          bg-nero-700 text-white px-4 py-3 
+          rounded-md shadow-lg border border-nero-500
+          min-w-[260px] max-w-[90%] flex items-start justify-between gap-3
+        "
+      >
+        <span className="text-sm">
+          Something went wrong while generating the PDF.
+        </span>
+
+        <button
+          className="text-white text-lg leading-none hover:text-red-300 transition"
+          onClick={this.closeToast}
+        >
+          ✕
+        </button>
+      </div>
+    );
   }
 
   render() {
-    if (this.state.hasError) {
-      return (
-        <div className="flex justify-center items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-md">
-          <h2 className="text-red-800 font-semibold">Something went wrong with PDF generation.</h2>
-          <button
-            className="mt-2 px-3 py-1 bg-red-600 text-white rounded text-sm"
-            onClick={() => this.setState({ hasError: false, error: null })}
-          >
-            Try Again
-          </button>
-        </div>
-      );
-    }
-
-    return this.props.children;
+    return (
+      <>
+        {this.props.children}
+        {this.renderToast()}
+      </>
+    );
   }
 }
 

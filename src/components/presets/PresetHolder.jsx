@@ -53,7 +53,7 @@ const PresetHolder = () => {
 
 
       {/* CONTENT */}
-      <div className="minimal-scrollbar w-full h-[calc(100vh-96px)] overflow-auto flex flex-col relative">
+      <div className="minimal-scrollbar w-full h-[calc(100vh-100px)] overflow-auto flex flex-col relative">
         <AnimatePresence mode="wait">
           {currentTab === 0 && (
             <motion.div

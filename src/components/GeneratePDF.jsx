@@ -254,7 +254,7 @@ export default function GeneratePDF({ coupons, error }) {
   if (!coupons.length || error) return null;
 
   return (
-    <div className="w-full flex flex-col items-center gap-4">
+    <div className="w-full flex flex-col items-center gap-4 bg-nero-800 p-2.5">
       <AnimatePresence mode="wait">
         {(phase === "qr" || phase === "pdf" || phase === "merge") && (
           <ProgressBar progress={progress} phase={phase} />

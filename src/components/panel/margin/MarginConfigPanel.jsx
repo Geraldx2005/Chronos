@@ -8,7 +8,7 @@ const MarginConfigPanel = () => {
   const layout = useLayout();
 
   return (
-    <div className="w-full flex flex-col p-3 border-b-2 border-nero-900">
+    <div className="w-full flex flex-col p-2.5 border-b-2 bg-nero-800 border-nero-900">
       <div className="flex flex-col gap-2.5">
         <div className="w-full flex items-center justify-between">
           <h2 className="text-lg font-medium">Margin <span className="text-[11px]">(mm)</span></h2>

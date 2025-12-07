@@ -1,3 +1,4 @@
+// UploadExcel.jsx UPDATED
 import { useState, useCallback, useRef, useEffect } from "react";
 import ExcelJS from "exceljs";
 import GeneratePDF from "./GeneratePDF";
@@ -27,52 +28,42 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
   } = values;
 
   const parseExcelFile = useCallback(async (file) => {
-    try {
-      const workbook = new ExcelJS.Workbook();
-      const buffer = await readFileAsArrayBuffer(file);
-      await workbook.xlsx.load(buffer);
+    const workbook = new ExcelJS.Workbook();
+    const buffer = await readFileAsArrayBuffer(file);
+    await workbook.xlsx.load(buffer);
 
-      const worksheet = workbook.worksheets[0];
-      if (!worksheet) {
-        throw new Error("No worksheets found in the Excel file");
-      }
+    const worksheet = workbook.worksheets[0];
+    if (!worksheet) throw new Error("No worksheets found in the Excel file");
 
-      const headers = [];
-      const firstRow = worksheet.getRow(1);
+    const headers = [];
+    worksheet.getRow(1).eachCell((cell, i) => {
+      headers[i] = cell.value?.toString().trim() || `Column${i}`;
+    });
 
-      firstRow.eachCell((cell, colNumber) => {
-        headers[colNumber] = cell.value?.toString().trim() || `Column${colNumber}`;
+    const data = [];
+    for (let i = 2; i <= worksheet.rowCount; i++) {
+      const row = worksheet.getRow(i);
+      const rowData = {};
+      let hasData = false;
+
+      row.eachCell((cell, col) => {
+        if (cell.value != null) {
+          rowData[headers[col]] = cell.value;
+          hasData = true;
+        }
       });
 
-      const data = [];
-      for (let rowNumber = 2; rowNumber <= worksheet.rowCount; rowNumber++) {
-        const row = worksheet.getRow(rowNumber);
-        const rowData = {};
-
-        let hasData = false;
-        row.eachCell((cell, colNumber) => {
-          if (cell.value != null) {
-            rowData[headers[colNumber]] = cell.value;
-            hasData = true;
-          }
-        });
-
-        if (hasData) {
-          data.push(rowData);
-        }
-      }
-
-      return data;
-    } catch (err) {
-      throw new Error(`Failed to parse Excel file: ${err.message}`);
+      if (hasData) data.push(rowData);
     }
+
+    return data;
   }, []);
 
   const readFileAsArrayBuffer = (file) => {
-    return new Promise((resolve, reject) => {
+    return new Promise((res, rej) => {
       const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = () => reject(new Error("Failed to read file"));
+      reader.onload = () => res(reader.result);
+      reader.onerror = () => rej(new Error("Failed to read file"));
       reader.readAsArrayBuffer(file);
     });
   };
@@ -84,10 +75,7 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
     if (!file.name.match(/\.(xlsx|xls)$/i)) {
       setError("Please upload a valid file (.xlsx)");
       setCoupons([]);
-
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
 
@@ -96,58 +84,62 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
 
     try {
       const data = await parseExcelFile(file);
-
       setCoupons(data);
     } catch (err) {
       setError(err.message);
       setCoupons([]);
-
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
     } finally {
       setIsLoading(false);
     }
   }, [parseExcelFile, setCoupons]);
 
+  // RESET FIX
   useEffect(() => {
-    if (resetSignal && fileInputRef.current) {
-      fileInputRef.current.value = "";
+    if (resetSignal) {
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      setCoupons([]);
+      setError(null);
     }
   }, [resetSignal]);
 
-  return (
-    <div className="w-full flex flex-col items-center">
-      <div className="w-full p-3 pb-1 flex flex-col justify-center items-center gap-1">
+  const checkSizesBeforeUpload = (e) => {
+    const noPaper = !paperWidthPt || !paperHeightPt;
+    const noCoupon = !couponWidthPt || !couponHeightPt;
 
+    if (noPaper && noCoupon) {
+      e.preventDefault();
+      triggerToast("Please set paper and coupon size");
+      return true;
+    }
+
+    if (noPaper) {
+      e.preventDefault();
+      triggerToast("Please set a paper size");
+      return true;
+    }
+
+    if (noCoupon) {
+      e.preventDefault();
+      triggerToast("Please set a coupon size");
+      return true;
+    }
+
+    return false;
+  };
+
+  return (
+    <div className="w-full flex flex-col items-center bg-nero-800 focus:outline-none focus:ring-1 focus:border-nero-400">
+      <div className="w-full p-2.5 flex flex-col justify-center items-center gap-1 focus:outline-none focus:ring-1 focus:border-nero-400">
         <input
           ref={fileInputRef}
-          className="w-full h-12 p-2 flex items-center cursor-pointer bg-nero-800 border border-default-medium text-heading text-sm rounded-md focus:ring-brand focus:border-brand placeholder:text-body"
+          className="w-full h-12 p-2 flex items-center cursor-pointer bg-nero-800 border border-default-medium text-heading text-sm rounded-md focus:ring-brand focus:border-brand focus:outline-none"
           id="file_input"
           accept=".xlsx,.xls"
           disabled={isLoading}
           type="file"
           onClick={(e) => {
-            const noPaper = !paperWidthPt || !paperHeightPt;
-            const noCoupon = !couponWidthPt || !couponHeightPt;
-
-            if (noPaper && noCoupon) {
-              e.preventDefault();
-              triggerToast("Please set both paper and coupon size");
-              return;
-            }
-
-            if (noPaper) {
-              e.preventDefault();
-              triggerToast("Please set a paper size");
-              return;
-            }
-
-            if (noCoupon) {
-              e.preventDefault();
-              triggerToast("Please set a coupon size");
-              return;
-            }
+            if (checkSizesBeforeUpload(e)) return;
           }}
           onChange={handleFile}
         />
@@ -168,14 +160,10 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
       </div>
 
       <ErrorBoundary>
-        <GeneratePDF coupons={coupons} error={error} />
+        <GeneratePDF key={resetSignal} coupons={coupons} error={error} />
       </ErrorBoundary>
 
-      <Toast
-        message={toastMsg}
-        show={showToast}
-        onClose={() => setShowToast(false)}
-      />
+      <Toast message={toastMsg} show={showToast} onClose={() => setShowToast(false)} />
     </div>
   );
 }
