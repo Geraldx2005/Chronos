@@ -12,7 +12,7 @@ const SizeConfigPanel = () => {
     const ptToMm = (pt) => pt / 2.8346456693;
     const inToPt = (inch) => inch * 72;
 
-    // ⭐ CLEAN FORMATTER — removes unnecessary decimals
+    // CLEAN FORMATTER — removes unnecessary decimals
     const cleanNumber = (num) => {
         if (num == null || isNaN(num)) return "0";
         const rounded = parseFloat(num.toFixed(2));
@@ -157,7 +157,7 @@ const SizeConfigPanel = () => {
             </div>
 
             <div className="flex flex-col gap-1">
-                <h2 className="text-lg text-nero-400 font-medium">Coupon Size</h2>
+                <h2 className="text-lg text-nero-400 font-medium">Label Size</h2>
 
                 <div className="w-full flex items-center gap-2">
                     <SizeInput

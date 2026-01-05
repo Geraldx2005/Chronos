@@ -1,7 +1,7 @@
 import { Document, Page, pdf, View } from "@react-pdf/renderer";
 import { generateQR } from "../utils/generateQR";
 import { useState, useEffect, useRef } from "react";
-import { addTrimMarksToPDF } from "../utils/TrimMarksPDFLib";
+// import { addTrimMarksToPDF } from "../utils/TrimMarksPDFLib";
 import TokenTemplate from "../utils/TokenTemplate";
 import { useLayout } from "../context/LayoutProvider";
 import mergePDFBuffers from "../utils/mergePDFBuffers";
@@ -10,6 +10,10 @@ import { useRefresh } from "../context/RefreshContext";
 import Toast from "../utils/Toast";
 
 import { AnimatePresence, motion } from "framer-motion";
+
+// COUPON GAPS (print units: points)
+const GAP_X_PT = 11.338582677; // horizontal gap (≈ 3mm = 8.5pt)
+const GAP_Y_PT = 11.338582677; // vertical gap (≈ 3mm = 8.5pt)
 
 function computeAutoMargins(layout) {
   const {
@@ -22,11 +26,20 @@ function computeAutoMargins(layout) {
   if (!paperWidthPt || !paperHeightPt || !couponWidthPt || !couponHeightPt)
     return;
 
-  const cols = Math.floor(paperWidthPt / couponWidthPt);
-  const rows = Math.floor(paperHeightPt / couponHeightPt);
+  const cols = Math.floor(
+    (paperWidthPt + GAP_X_PT) / (couponWidthPt + GAP_X_PT)
+  );
 
-  const usedW = cols * couponWidthPt;
-  const usedH = rows * couponHeightPt;
+  const rows = Math.floor(
+    (paperHeightPt + GAP_Y_PT) / (couponHeightPt + GAP_Y_PT)
+  );
+
+  const usedW =
+    cols * couponWidthPt + Math.max(0, cols - 1) * GAP_X_PT;
+
+  const usedH =
+    rows * couponHeightPt + Math.max(0, rows - 1) * GAP_Y_PT;
+
 
   let marginX = Math.max(0, (paperWidthPt - usedW) / 2);
   let marginY = Math.max(0, (paperHeightPt - usedH) / 2);
@@ -44,6 +57,7 @@ function computeAutoMargins(layout) {
 
 const PDFDoc = ({ coupons, qrList, layout }) => {
   const { values } = layout;
+
   const {
     paperWidthPt,
     paperHeightPt,
@@ -59,8 +73,16 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
   const usableW = paperWidthPt - leftMargin - rightMargin;
   const usableH = paperHeightPt - topMargin - bottomMargin;
 
-  const columns = Math.max(1, Math.floor(usableW / couponWidthPt));
-  const rows = Math.max(1, Math.floor(usableH / couponHeightPt));
+  const columns = Math.max(
+    1,
+    Math.floor((usableW + GAP_X_PT) / (couponWidthPt + GAP_X_PT))
+  );
+
+  const rows = Math.max(
+    1,
+    Math.floor((usableH + GAP_Y_PT) / (couponHeightPt + GAP_Y_PT))
+  );
+
   const perPage = columns * rows;
 
   const pages = [];
@@ -81,8 +103,8 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
             const row = Math.floor(i / columns);
             const col = i % columns;
 
-            const x = leftMargin + col * couponWidthPt;
-            const y = topMargin + row * couponHeightPt;
+            const x = leftMargin + col * (couponWidthPt + GAP_X_PT);
+            const y = topMargin + row * (couponHeightPt + GAP_Y_PT);
 
             return (
               <View
@@ -132,8 +154,13 @@ const calculatePerPage = (layout) => {
   const usableW = paperWidthPt - leftMargin - rightMargin;
   const usableH = paperHeightPt - topMargin - bottomMargin;
 
-  const cols = Math.floor(usableW / couponWidthPt);
-  const rows = Math.floor(usableH / couponHeightPt);
+  const cols = Math.floor(
+    (usableW + GAP_X_PT) / (couponWidthPt + GAP_X_PT)
+  );
+
+  const rows = Math.floor(
+    (usableH + GAP_Y_PT) / (couponHeightPt + GAP_Y_PT)
+  );
 
   return cols * rows;
 };
@@ -141,7 +168,7 @@ const calculatePerPage = (layout) => {
 export default function GeneratePDF({ coupons, error }) {
   const { resetSignal } = useRefresh();
 
-  const qrListRef = useRef([]); // 🔥 performance optimized storage
+  const qrListRef = useRef([]); // performance optimized storage
   const [pdfBlob, setPdfBlob] = useState(null);
 
   const [isReady, setIsReady] = useState(false);
@@ -201,7 +228,7 @@ export default function GeneratePDF({ coupons, error }) {
         }
       }
 
-      qrListRef.current = temp; // 🔥 no rerenders
+      qrListRef.current = temp; // no rerenders
       setProgress(50);
       setIsReady(true);
     };
@@ -231,8 +258,7 @@ export default function GeneratePDF({ coupons, error }) {
         ).toBlob();
 
         const raw = await blob.arrayBuffer();
-        const trimmed = await addTrimMarksToPDF(raw, layout.values);
-        buffers.push(trimmed);
+        buffers.push(raw);
       }
 
       setPhase("merge");
