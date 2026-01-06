@@ -1,7 +1,7 @@
 import { Document, Page, pdf, View } from "@react-pdf/renderer";
 import { generateQR } from "../utils/generateQR";
 import { useState, useEffect, useRef } from "react";
-// import { addTrimMarksToPDF } from "../utils/TrimMarksPDFLib";
+import { addTrimMarksToPDF } from "../utils/TrimMarksPDFLib";
 import TokenTemplate from "../utils/TokenTemplate";
 import { useLayout } from "../context/LayoutProvider";
 import mergePDFBuffers from "../utils/mergePDFBuffers";
