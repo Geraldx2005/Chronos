@@ -12,8 +12,6 @@ import Toast from "../utils/Toast";
 import { AnimatePresence, motion } from "framer-motion";
 
 // COUPON GAPS (print units: points)
-const GAP_X_PT = 11.338582677; // horizontal gap (≈ 3mm = 8.5pt)
-const GAP_Y_PT = 11.338582677; // vertical gap (≈ 3mm = 8.5pt)
 
 function computeAutoMargins(layout) {
   const {
@@ -26,19 +24,21 @@ function computeAutoMargins(layout) {
   if (!paperWidthPt || !paperHeightPt || !couponWidthPt || !couponHeightPt)
     return;
 
+  const { gapXPt, gapYPt } = layout.values;
+
   const cols = Math.floor(
-    (paperWidthPt + GAP_X_PT) / (couponWidthPt + GAP_X_PT)
+    (paperWidthPt + gapXPt) / (couponWidthPt + gapXPt)
   );
 
   const rows = Math.floor(
-    (paperHeightPt + GAP_Y_PT) / (couponHeightPt + GAP_Y_PT)
+    (paperHeightPt + gapYPt) / (couponHeightPt + gapYPt)
   );
 
   const usedW =
-    cols * couponWidthPt + Math.max(0, cols - 1) * GAP_X_PT;
+    cols * couponWidthPt + Math.max(0, cols - 1) * gapXPt;
 
   const usedH =
-    rows * couponHeightPt + Math.max(0, rows - 1) * GAP_Y_PT;
+    rows * couponHeightPt + Math.max(0, rows - 1) * gapYPt;
 
 
   let marginX = Math.max(0, (paperWidthPt - usedW) / 2);
@@ -68,6 +68,8 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
     topMargin,
     bottomMargin,
     fontScale,
+    gapXPt,
+    gapYPt,
   } = values;
 
   const usableW = paperWidthPt - leftMargin - rightMargin;
@@ -75,12 +77,12 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
 
   const columns = Math.max(
     1,
-    Math.floor((usableW + GAP_X_PT) / (couponWidthPt + GAP_X_PT))
+    Math.floor((usableW + gapXPt) / (couponWidthPt + gapXPt))
   );
 
   const rows = Math.max(
     1,
-    Math.floor((usableH + GAP_Y_PT) / (couponHeightPt + GAP_Y_PT))
+    Math.floor((usableH + gapYPt) / (couponHeightPt + gapYPt))
   );
 
   const perPage = columns * rows;
@@ -103,8 +105,10 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
             const row = Math.floor(i / columns);
             const col = i % columns;
 
-            const x = leftMargin + col * (couponWidthPt + GAP_X_PT);
-            const y = topMargin + row * (couponHeightPt + GAP_Y_PT);
+            const x = leftMargin + col * (couponWidthPt + gapXPt);
+            const y = topMargin + row * (couponHeightPt + gapYPt);
+
+            const qrObj = qrList[globalIndex] || { };
 
             return (
               <View
@@ -117,9 +121,11 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
                   height: couponHeightPt,
                 }}
               >
+
                 <TokenTemplate
                   coupon={coupon}
-                  qrCode={qrList[globalIndex] || null}
+                  qrCode={qrObj.mainQr}
+                  internalQr={qrObj.internalQr}
                   couponWidthPt={couponWidthPt}
                   couponHeightPt={couponHeightPt}
                   fontSize={5 * fontScale}
@@ -149,26 +155,30 @@ const calculatePerPage = (layout) => {
     rightMargin,
     topMargin,
     bottomMargin,
+    gapXPt,
+    gapYPt,
   } = layout.values;
 
   const usableW = paperWidthPt - leftMargin - rightMargin;
   const usableH = paperHeightPt - topMargin - bottomMargin;
 
   const cols = Math.floor(
-    (usableW + GAP_X_PT) / (couponWidthPt + GAP_X_PT)
+    (usableW + gapXPt) / (couponWidthPt + gapXPt)
   );
 
   const rows = Math.floor(
-    (usableH + GAP_Y_PT) / (couponHeightPt + GAP_Y_PT)
+    (usableH + gapYPt) / (couponHeightPt + gapYPt)
   );
 
   return cols * rows;
 };
 
+
 export default function GeneratePDF({ coupons, error }) {
   const { resetSignal } = useRefresh();
 
-  const qrListRef = useRef([]); // performance optimized storage
+  const qrListRef = useRef([]);
+  // [{ mainQr, internalQr }]
   const [pdfBlob, setPdfBlob] = useState(null);
 
   const [isReady, setIsReady] = useState(false);
@@ -198,6 +208,8 @@ export default function GeneratePDF({ coupons, error }) {
     layout.values.paperHeightPt,
     layout.values.couponWidthPt,
     layout.values.couponHeightPt,
+    layout.values.gapXPt,
+    layout.values.gapYPt,
     layout.values.userMarginOverride,
   ]);
 
@@ -214,18 +226,20 @@ export default function GeneratePDF({ coupons, error }) {
 
       for (let b of batches) {
         for (let coupon of b) {
-          if (!coupon.qrCode) {
-            temp.push(null);
-            setProgress(Math.round((temp.length / coupons.length) * 50));
-            continue;
-          }
+          const mainQr = coupon.qrCode
+            ? await generateQR(coupon.qrCode.toString())
+            : null;
 
-          const qr = await generateQR(coupon.qrCode.toString());
-          temp.push(qr);
+          const internalQr = coupon["Internal Code"]
+            ? await generateQR(coupon["Internal Code"].toString())
+            : null;
+
+          temp.push({ mainQr, internalQr });
 
           setProgress(Math.round((temp.length / coupons.length) * 50));
           await new Promise((r) => setTimeout(r, 0));
         }
+
       }
 
       qrListRef.current = temp; // no rerenders

@@ -109,7 +109,7 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
 
     if (noPaper && noCoupon) {
       e.preventDefault();
-      triggerToast("Please set paper and coupon size");
+      triggerToast("Please set page and label size");
       return true;
     }
 

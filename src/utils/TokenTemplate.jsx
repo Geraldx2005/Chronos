@@ -1,7 +1,7 @@
 // components/TokenTemplate.jsx
 import { View, Text, Image, Font } from "@react-pdf/renderer";
 import logo from "../assets/brand-logo.jpg";
-import staticQr from "../assets/static-qr.png";
+// import staticQr from "../assets/static-qr.png";
 import TechUseTxt from "../assets/tech-use.png";
 
 // 🔥 FONT REGISTRATION MOVED HERE
@@ -41,6 +41,7 @@ if (!fontsRegistered) {
 const TokenTemplate = ({
   coupon,
   qrCode,
+  internalQr,
   couponWidthPt,
   couponHeightPt,
   fontSize,
@@ -61,9 +62,9 @@ const TokenTemplate = ({
         paddingBottom: 8,
         alignItems: "center",
         justifyContent: "flex-start",
-        borderWidth: 0.75,
-        borderTopWidth: 2,
-        borderBottomWidth: 2,
+        // borderWidth: 0.75,
+        // borderTopWidth: 2,
+        // borderBottomWidth: 2,
         borderColor: "#000",
         display: "flex",
       }}
@@ -148,7 +149,9 @@ const TokenTemplate = ({
             *For Internal use only
           </Text>
 
-          <Image src={staticQr} style={{ width: "100%" }} />
+          {internalQr && (
+            <Image src={internalQr} style={{ width: "100%" }} />
+          )}
         </View>
 
         <View
