@@ -108,7 +108,7 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
             const x = leftMargin + col * (couponWidthPt + gapXPt);
             const y = topMargin + row * (couponHeightPt + gapYPt);
 
-            const qrObj = qrList[globalIndex] || { };
+            const qrObj = qrList[globalIndex] || {};
 
             return (
               <View
@@ -279,7 +279,14 @@ export default function GeneratePDF({ coupons, error }) {
       setProgress(95);
 
       const merged = await mergePDFBuffers(buffers);
-      setPdfBlob(new Blob([merged], { type: "application/pdf" }));
+
+      const trimmedPdf = await addTrimMarksToPDF(
+        merged,
+        layout.values
+      );
+
+      setPdfBlob(new Blob([trimmedPdf], { type: "application/pdf" }));
+
 
       setProgress(100);
       setIsGenerating(false);
