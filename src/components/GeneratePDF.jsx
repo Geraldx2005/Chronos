@@ -1,4 +1,4 @@
-import { Document, Page, pdf, View } from "@react-pdf/renderer";
+import { Document, Page, pdf, View, Text } from "@react-pdf/renderer";
 import { generateQR } from "../utils/generateQR";
 import { useState, useEffect, useRef } from "react";
 import { addTrimMarksToPDF } from "../utils/TrimMarksPDFLib";
@@ -100,6 +100,69 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
           size={{ width: paperWidthPt, height: paperHeightPt }}
           style={{ position: "relative" }}
         >
+          <View
+            style={{
+              position: "absolute",
+
+              // container = full top margin band
+              top: 0,
+              height: topMargin,
+
+              // anchored to paper edge
+              right: rightMargin,
+
+              width: paperWidthPt,
+
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "flex-end",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 14,
+                color: "#000",
+                textAlign: "right",
+                fontWeight: 700,
+                paddingBottom: 10,
+              }}
+            >
+              GWPMUUKACOO4E8 (44) | EUREKA | DEC 2025 | Lot 1 | Job 1 | Sheet {pIndex + 1}/{pages.length}
+            </Text>
+          </View>
+          <View
+            style={{
+              position: "absolute",
+
+              // container = full top margin band
+              bottom: 0,
+              height: bottomMargin,
+
+              // anchored to paper edge
+              left: leftMargin,
+
+              width: paperWidthPt,
+
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "flex-start",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 14,
+                color: "#000",
+                textAlign: "left",
+                fontWeight: 700,
+                paddingTop: 10,
+              }}
+            >
+              GWPMUUKACOO4E8 (44) | EUREKA | DEC 2025 | Lot 1 | Job 1 | Sheet {pIndex + 1}/{pages.length}
+            </Text>
+          </View>
+
+
+
           {pageCoupons.map((coupon, i) => {
             const globalIndex = pIndex * perPage + i;
             const row = Math.floor(i / columns);

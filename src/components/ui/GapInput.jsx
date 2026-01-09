@@ -69,7 +69,7 @@ const GapInput = () => {
                     onChange={(e) => handleGapXChange(e.target.value)}
                     onFocus={(e) => e.target.select()}
                     onBlur={(e) => {
-                        if (e.target.value === "") handleGapXChange("3");
+                        if (e.target.value === "") handleGapXChange("0");
                     }}
                     className="no-spinner w-[40%] h-8 px-2 py-1 bg-nero-700 rounded-md rounded-l-none border border-nero-600 text-sm"
                 />
@@ -87,7 +87,7 @@ const GapInput = () => {
                     onChange={(e) => handleGapYChange(e.target.value)}
                     onFocus={(e) => e.target.select()}
                     onBlur={(e) => {
-                        if (e.target.value === "") handleGapYChange("3");
+                        if (e.target.value === "") handleGapYChange("0");
                     }}
                     className="no-spinner w-[40%] h-8 px-2 py-1 bg-nero-700 rounded-md rounded-l-none border border-nero-600 text-sm"
                 />

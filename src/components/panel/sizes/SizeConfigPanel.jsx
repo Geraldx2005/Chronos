@@ -51,6 +51,20 @@ const SizeConfigPanel = () => {
         layout.values.presetUpdate
     ]);
 
+    useEffect(() => {
+        // ALWAYS reflect layout → inputs
+        setPaperWidthInput(
+            cleanNumber(ptToMm(layout.values.paperWidthPt))
+        );
+        setPaperHeightInput(
+            cleanNumber(ptToMm(layout.values.paperHeightPt))
+        );
+    }, [
+        layout.values.paperWidthPt,
+        layout.values.paperHeightPt
+    ]);
+
+
     // ---------------------------
     // INPUT HANDLERS
     // ---------------------------

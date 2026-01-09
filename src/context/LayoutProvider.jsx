@@ -31,8 +31,8 @@ export const LayoutProvider = ({ children }) => {
   // Gaps
   const MM_TO_PT = 2.834645669;
 
-  const [gapXPt, setGapXPt] = useState(3 * MM_TO_PT);
-  const [gapYPt, setGapYPt] = useState(3 * MM_TO_PT);
+  const [gapXPt, setGapXPt] = useState(0 * MM_TO_PT);
+  const [gapYPt, setGapYPt] = useState(0 * MM_TO_PT);
 
   const [userMarginOverride, setUserMarginOverride] = useState(false);
 

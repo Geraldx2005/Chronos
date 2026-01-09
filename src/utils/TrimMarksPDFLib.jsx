@@ -41,9 +41,7 @@ export const addTrimMarksToPDF = async (pdfBytes, layout) => {
   return pdfDoc.save();
 };
 
-// ----------------------------------------------
 // TRIM MARK DRAWER
-// ----------------------------------------------
 function addDynamicTrimMarks(
   page,
   pageWidth,
@@ -60,7 +58,7 @@ function addDynamicTrimMarks(
   const thickness = 0.7;
   const len = 8.5039;
 
-  // ✅ 1mm offset (POINTS)
+  // 1mm offset (POINTS)
   const TRIM_OFFSET = 2.83465;
 
   const usableW = pageWidth - leftMargin - rightMargin;
@@ -81,9 +79,7 @@ function addDynamicTrimMarks(
     startX + cols * couponWidth + (cols - 1) * gapX;
   const endY = startY + gridHeight;
 
-  // ─────────────────────────────
   // CUT GRIDS
-  // ─────────────────────────────
   const xCuts = [];
   for (let c = 0; c <= cols; c++) {
     xCuts.push(
@@ -102,9 +98,7 @@ function addDynamicTrimMarks(
     );
   }
 
-  // ─────────────────────────────
   // TOP & BOTTOM (VERTICAL)
-  // ─────────────────────────────
   xCuts.forEach((x) => {
     // bottom
     page.drawLine({
@@ -121,9 +115,7 @@ function addDynamicTrimMarks(
     });
   });
 
-  // ─────────────────────────────
   // LEFT & RIGHT (HORIZONTAL)
-  // ─────────────────────────────
   yCuts.forEach((y) => {
     // left
     page.drawLine({
@@ -140,12 +132,7 @@ function addDynamicTrimMarks(
     });
   });
 
-  // ─────────────────────────────
-  // SECOND TRIM LOOP (OFFSET TOO)
-  // ─────────────────────────────
-  // ─────────────────────────────
   // SECOND TRIM LOOP (ONLY IF GAP EXISTS)
-  // ─────────────────────────────
   if (gapX > 0 || gapY > 0) {
 
     for (let c = 0; c < cols - 1; c++) {

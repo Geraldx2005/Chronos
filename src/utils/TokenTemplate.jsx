@@ -1,6 +1,6 @@
 // components/TokenTemplate.jsx
 import { View, Text, Image, Font } from "@react-pdf/renderer";
-import logo from "../assets/brand-logo.jpg";
+import logo from "../assets/brand-logo2.jpg";
 // import staticQr from "../assets/static-qr.png";`
 import TechUseTxt from "../assets/tech-use.png";
 
