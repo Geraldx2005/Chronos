@@ -302,9 +302,16 @@ export default function GeneratePDF({ coupons, jobMeta, error }) {
 
       for (let b of batches) {
         for (let coupon of b) {
-          const mainQr = coupon.qrCode
-            ? await generateQR(coupon.qrCode.toString())
-            : null;
+          const qrValue =
+            coupon.qrCode !== undefined
+              ? coupon.qrCode
+              : coupon["Code URL"];
+
+          const mainQr =
+            qrValue !== undefined && qrValue !== null && qrValue !== ""
+              ? await generateQR(qrValue.toString())
+              : null;
+
 
           const internalQr = coupon["Internal Code"]
             ? await generateQR(coupon["Internal Code"].toString())
