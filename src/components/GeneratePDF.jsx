@@ -8,6 +8,8 @@ import mergePDFBuffers from "../utils/mergePDFBuffers";
 import ProgressBar from "../utils/ProgressBar";
 import { useRefresh } from "../context/RefreshContext";
 import Toast from "../utils/Toast";
+import { parseJobMetaFromFileName } from "../utils/parseJobMetaFromFileName";
+
 
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -55,7 +57,18 @@ function computeAutoMargins(layout) {
   }
 }
 
-const PDFDoc = ({ coupons, qrList, layout }) => {
+const PDFDoc = ({
+  coupons,
+  qrList,
+  layout,
+  pageOffset,
+  totalSheets,
+  totalLabels,
+  code,
+  lot,
+  job,
+}) => {
+
   const { values } = layout;
 
   const {
@@ -127,7 +140,7 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
                 paddingBottom: 10,
               }}
             >
-              GWPMUUKACOO4E8 (44) | EUREKA | DEC 2025 | Lot 1 | Job 1 | Sheet {pIndex + 1}/{pages.length}
+              {code} ({totalLabels}) | EUREKA | DEC 2025 | Lot {lot} | Job {job} | Sheet {pageOffset + pIndex + 1}/{totalSheets}
             </Text>
           </View>
           <View
@@ -157,7 +170,7 @@ const PDFDoc = ({ coupons, qrList, layout }) => {
                 paddingTop: 10,
               }}
             >
-              GWPMUUKACOO4E8 (44) | EUREKA | DEC 2025 | Lot 1 | Job 1 | Sheet {pIndex + 1}/{pages.length}
+              {code} ({totalLabels}) | EUREKA | DEC 2025 | Lot {lot} | Job {job} | Sheet {pageOffset + pIndex + 1}/{totalSheets}
             </Text>
           </View>
 
@@ -237,7 +250,7 @@ const calculatePerPage = (layout) => {
 };
 
 
-export default function GeneratePDF({ coupons, error }) {
+export default function GeneratePDF({ coupons, jobMeta, error }) {
   const { resetSignal } = useRefresh();
 
   const qrListRef = useRef([]);
@@ -323,19 +336,37 @@ export default function GeneratePDF({ coupons, error }) {
 
       const perPage = calculatePerPage(layout);
       const couponPages = split(coupons, perPage);
+      const totalSheets = Math.ceil(coupons.length / perPage);
       const qrPages = split(qrListRef.current, perPage);
 
       const buffers = [];
 
+      let globalPageOffset = 0;
+
       for (let i = 0; i < couponPages.length; i++) {
+
         setProgress(50 + Math.round(((i + 1) / couponPages.length) * 40));
 
         const blob = await pdf(
-          <PDFDoc coupons={couponPages[i]} qrList={qrPages[i]} layout={layout} />
+          <PDFDoc
+            coupons={couponPages[i]}
+            qrList={qrPages[i]}
+            layout={layout}
+            pageOffset={globalPageOffset}
+            totalSheets={totalSheets}
+            totalLabels={coupons.length}
+            code={jobMeta.code}
+            lot={jobMeta.lot}
+            job={jobMeta.job}
+          />
+
+
         ).toBlob();
 
         const raw = await blob.arrayBuffer();
         buffers.push(raw);
+        globalPageOffset += Math.ceil(couponPages[i].length / perPage);
+
       }
 
       setPhase("merge");
@@ -380,7 +411,7 @@ export default function GeneratePDF({ coupons, error }) {
                 const url = URL.createObjectURL(pdfBlob);
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = "coupons.pdf";
+                a.download = `${jobMeta.code} (${coupons.length}).pdf`;
                 a.click();
                 URL.revokeObjectURL(url);
               }}

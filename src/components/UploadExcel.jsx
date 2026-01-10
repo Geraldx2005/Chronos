@@ -5,6 +5,8 @@ import GeneratePDF from "./GeneratePDF";
 import ErrorBoundary from "../utils/ErrorBoundary";
 import Toast from "../utils/Toast";
 import { useLayout } from "../context/LayoutProvider";
+import { parseJobMetaFromFileName } from "../utils/parseJobMetaFromFileName";
+
 
 export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, couponsLength, coupons }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -13,6 +15,8 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
 
   const [toastMsg, setToastMsg] = useState("");
   const [showToast, setShowToast] = useState(false);
+
+  const [jobMeta, setJobMeta] = useState({ code: "", lot: "", job: "",});
 
   const triggerToast = (msg) => {
     setToastMsg(msg);
@@ -84,7 +88,13 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
 
     try {
       const data = await parseExcelFile(file);
-      setCoupons(data);
+
+// 🔥 PARSE META FROM FILE NAME
+const meta = parseJobMetaFromFileName(file.name);
+setJobMeta(meta);
+
+setCoupons(data);
+
     } catch (err) {
       setError(err.message);
       setCoupons([]);
@@ -160,8 +170,12 @@ export default function UploadExcel({ resetSignal, setCoupons, hasCoupons, coupo
       </div>
 
       <ErrorBoundary>
-        <GeneratePDF key={resetSignal} coupons={coupons} error={error} />
-      </ErrorBoundary>
+<GeneratePDF
+  coupons={coupons}
+  jobMeta={jobMeta}
+  key={resetSignal}
+  error={error}
+/>      </ErrorBoundary>
 
       <Toast message={toastMsg} show={showToast} onClose={() => setShowToast(false)} />
     </div>
