@@ -52,17 +52,21 @@ const SizeConfigPanel = () => {
     ]);
 
     useEffect(() => {
-        // ALWAYS reflect layout → inputs
-        setPaperWidthInput(
-            cleanNumber(ptToMm(layout.values.paperWidthPt))
-        );
-        setPaperHeightInput(
-            cleanNumber(ptToMm(layout.values.paperHeightPt))
-        );
+        const { paperWidthPt, paperHeightPt, paperUnit } = layout.values;
+
+        const toDisplay = (pt) =>
+            paperUnit === "mm"
+                ? cleanNumber(ptToMm(pt))
+                : cleanNumber(pt / 72);
+
+        setPaperWidthInput(toDisplay(paperWidthPt));
+        setPaperHeightInput(toDisplay(paperHeightPt));
     }, [
+        layout.values.paperUnit,
         layout.values.paperWidthPt,
-        layout.values.paperHeightPt
+        layout.values.paperHeightPt,
     ]);
+
 
 
     // ---------------------------
@@ -70,13 +74,15 @@ const SizeConfigPanel = () => {
     // ---------------------------
     const handlePaperWidthChange = (val) => {
         setPaperWidthInput(val);
+
+        if (val === "") return; // allow empty while typing
+
         const n = Number(val);
-        if (!isNaN(n)) {
-            layout.set.setPaperWidthPt(
-                layout.values.paperUnit === "mm" ? mmToPt(n) : inToPt(n)
-            );
-        }
-        handleRefresh();
+        if (isNaN(n)) return;
+
+        layout.set.setPaperWidthPt(
+            layout.values.paperUnit === "mm" ? mmToPt(n) : inToPt(n)
+        );
     };
 
     const handlePaperHeightChange = (val) => {

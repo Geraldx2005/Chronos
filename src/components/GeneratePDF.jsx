@@ -249,7 +249,6 @@ const calculatePerPage = (layout) => {
   return cols * rows;
 };
 
-
 export default function GeneratePDF({ coupons, jobMeta, error }) {
   const { resetSignal } = useRefresh();
 
@@ -322,7 +321,6 @@ export default function GeneratePDF({ coupons, jobMeta, error }) {
           setProgress(Math.round((temp.length / coupons.length) * 50));
           await new Promise((r) => setTimeout(r, 0));
         }
-
       }
 
       qrListRef.current = temp; // no rerenders
@@ -367,7 +365,6 @@ export default function GeneratePDF({ coupons, jobMeta, error }) {
             job={jobMeta.job}
           />
 
-
         ).toBlob();
 
         const raw = await blob.arrayBuffer();
@@ -388,7 +385,6 @@ export default function GeneratePDF({ coupons, jobMeta, error }) {
 
       setPdfBlob(new Blob([trimmedPdf], { type: "application/pdf" }));
 
-
       setProgress(100);
       setIsGenerating(false);
 
@@ -400,6 +396,22 @@ export default function GeneratePDF({ coupons, jobMeta, error }) {
   }, [isReady, coupons, layout.values]);
 
   if (!coupons.length || error) return null;
+
+  const getOutputFileName = () => {
+    const code = jobMeta?.code || "OUTPUT";
+    const count = coupons.length;
+
+    const lot = jobMeta?.lot ? `Lot ${jobMeta.lot}` : null;
+    const job = jobMeta?.job ? `Job ${jobMeta.job}` : null;
+
+    const extra =
+      lot || job
+        ? ` ( ${[lot, job].filter(Boolean).join(", ")} )`
+        : "";
+
+    return `${code} (${count})${extra}.pdf`;
+  };
+
 
   return (
     <div className="w-full flex flex-col items-center gap-4 bg-nero-800 p-2.5">
@@ -418,7 +430,7 @@ export default function GeneratePDF({ coupons, jobMeta, error }) {
                 const url = URL.createObjectURL(pdfBlob);
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = `${jobMeta.code} (${coupons.length}).pdf`;
+                a.download = getOutputFileName();
                 a.click();
                 URL.revokeObjectURL(url);
               }}
